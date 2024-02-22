@@ -6,4 +6,5 @@ type User struct {
 	Name     string `json:"name"`
 	LastName string `json:"lastName"`
 	Roles    []Role `json:"roles"`
+	TimeData
 }
