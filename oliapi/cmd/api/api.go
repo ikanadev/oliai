@@ -1,7 +1,7 @@
 package main
 
-import "fmt"
+import "oliapi/rest"
 
 func main() {
-	fmt.Println("Hello world!")
+	rest.ServeRoutes()
 }
