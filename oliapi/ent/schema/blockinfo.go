@@ -31,7 +31,6 @@ func (BlockInfo) Edges() []ent.Edge {
 		edge.
 			From("category", BlockCategory.Type).
 			Ref("blocks").
-			Field("category_id").
 			Required().Immutable().Unique(),
 	}
 }

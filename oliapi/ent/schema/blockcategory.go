@@ -32,7 +32,6 @@ func (BlockCategory) Edges() []ent.Edge {
 		edge.
 			From("bot", Bot.Type).
 			Ref("blocks").
-			Field("bot_id").
 			Required().Immutable().Unique(),
 	}
 }

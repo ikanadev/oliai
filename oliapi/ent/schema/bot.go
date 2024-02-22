@@ -34,7 +34,6 @@ func (Bot) Edges() []ent.Edge {
 		edge.
 			From("company", Company.Type).
 			Ref("bots").
-			Field("company_id").
 			Required().Immutable().Unique(),
 	}
 }
