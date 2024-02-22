@@ -2,7 +2,11 @@ module oliapi
 
 go 1.22.0
 
-require github.com/labstack/echo/v4 v4.11.4
+require (
+	entgo.io/ent v0.13.0
+	github.com/google/uuid v1.3.0
+	github.com/labstack/echo/v4 v4.11.4
+)
 
 require (
 	github.com/labstack/gommon v0.4.2 // indirect
