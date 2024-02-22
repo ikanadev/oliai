@@ -1,3 +1,3 @@
-module github.com/ikanadev/oliai/oliapi
+module oliapi
 
 go 1.22.0
