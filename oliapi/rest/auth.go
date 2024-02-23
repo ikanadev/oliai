@@ -13,16 +13,14 @@ type userTokenData struct {
 	Role []string
 }
 
-func createToken(id string) (string, error) {
-	config := GetConfig()
+func createToken(id string, jwtKey string) (string, error) {
 	token := jwt.New(jwt.SigningMethodHS256)
 	claims := token.Claims.(jwt.MapClaims)
 	claims["id"] = id
 	claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
-	return token.SignedString(config.JWTKey)
+	return token.SignedString(jwtKey)
 }
 
-func authMiddleware() echo.MiddlewareFunc {
-	config := GetConfig()
-	return echojwt.JWT(config.JWTKey)
+func authMiddleware(jwtKey string) echo.MiddlewareFunc {
+	return echojwt.JWT(jwtKey)
 }

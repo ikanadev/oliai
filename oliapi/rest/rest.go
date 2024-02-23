@@ -31,7 +31,12 @@ func NewRestServer() (RestServer, error) {
 	if err != nil {
 		return server, err
 	}
-	err = ent.Schema.Create(context.Background())
+	ctx := context.Background()
+	err = ent.Schema.Create(ctx)
+	if err != nil {
+		return server, err
+	}
+	err = populateStaticData(ent, ctx)
 	if err != nil {
 		return server, err
 	}

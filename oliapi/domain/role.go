@@ -4,14 +4,14 @@ type Role int
 
 const (
 	RoleAdmin Role = iota
-	StaffAdmin
+	RoleStaffAdmin
 )
 
 func (r Role) String() string {
 	switch r {
 	case RoleAdmin:
 		return "admin"
-	case StaffAdmin:
+	case RoleStaffAdmin:
 		return "admin_staff"
 	}
 	return "unknown"
@@ -22,7 +22,7 @@ func RoleFromSting(s string) Role {
 	case "admin":
 		return RoleAdmin
 	case "admin_staff":
-		return StaffAdmin
+		return RoleStaffAdmin
 	}
-	return StaffAdmin
+	return RoleStaffAdmin
 }
