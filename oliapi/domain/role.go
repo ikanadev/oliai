@@ -16,3 +16,13 @@ func (r Role) String() string {
 	}
 	return "unknown"
 }
+
+func RoleFromSting(s string) Role {
+	switch s {
+	case "admin":
+		return RoleAdmin
+	case "admin_staff":
+		return StaffAdmin
+	}
+	return StaffAdmin
+}

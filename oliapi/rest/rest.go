@@ -1,11 +1,41 @@
 package rest
 
-import "github.com/labstack/echo/v4"
+import (
+	"context"
+	"oliapi/domain/repositories"
+	"oliapi/ent"
+	"oliapi/rest/user"
 
-func ServeRoutes() {
-	app := echo.New()
-	app.GET("/status", func(c echo.Context) error {
-		return c.JSON(200, "running")
-	})
-	app.Logger.Fatal(app.Start(":4000"))
+	"github.com/labstack/echo/v4"
+	_ "github.com/lib/pq"
+)
+
+type RestServer struct {
+	app      *echo.Echo
+	config   Config
+	userRepo repositories.UserRepository
+	ent      *ent.Client
+}
+
+func (s RestServer) Start() error {
+	user.SetUpUserRoutes(s.app)
+
+	return s.app.Start(":" + s.config.Port)
+}
+
+func NewRestServer() (RestServer, error) {
+	server := RestServer{}
+	server.app = echo.New()
+	server.config = GetConfig()
+	ent, err := ent.Open("postgres", server.config.DbConn)
+	if err != nil {
+		return server, err
+	}
+	err = ent.Schema.Create(context.Background())
+	if err != nil {
+		return server, err
+	}
+	server.ent = ent
+	server.userRepo = user.NewUserRepo(server.ent)
+	return server, nil
 }
