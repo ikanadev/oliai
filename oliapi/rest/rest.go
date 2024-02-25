@@ -2,7 +2,7 @@ package rest
 
 import (
 	"context"
-	"oliapi/domain/repositories"
+	"oliapi/domain/repository"
 	"oliapi/ent"
 	"oliapi/rest/user"
 
@@ -13,7 +13,7 @@ import (
 type RestServer struct {
 	app      *echo.Echo
 	config   Config
-	userRepo repositories.UserRepository
+	userRepo repository.UserRepository
 	ent      *ent.Client
 }
 

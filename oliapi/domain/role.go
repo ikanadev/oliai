@@ -14,6 +14,7 @@ func (r Role) String() string {
 	case RoleStaffAdmin:
 		return "admin_staff"
 	}
+
 	return "unknown"
 }
 
@@ -24,5 +25,6 @@ func RoleFromSting(s string) Role {
 	case "admin_staff":
 		return RoleStaffAdmin
 	}
+
 	return RoleStaffAdmin
 }

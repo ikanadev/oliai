@@ -3,31 +3,68 @@ package user
 import (
 	"context"
 	"oliapi/domain"
+	"oliapi/domain/repository"
 	"oliapi/ent"
 	"oliapi/ent/user"
+	"oliapi/rest/utils"
 
 	"github.com/google/uuid"
+	"golang.org/x/crypto/bcrypt"
 )
 
-type UserRepo struct {
+func NewUserRepo(ent *ent.Client) Repo {
+	return Repo{ent: ent}
+}
+
+type Repo struct {
 	ent *ent.Client
-	ctx context.Context
 }
 
-func NewUserRepo(ent *ent.Client) UserRepo {
-	return UserRepo{ent: ent}
+// VerifyUser implements repository.UserRepository.
+func (Repo) VerifyUser(ctx context.Context, email string, password string) (domain.User, error) {
+	panic("unimplemented")
 }
 
-func (u UserRepo) GetUser(id uuid.UUID) (domain.User, error) {
-	appUser := domain.User{}
-	dbUser, err := u.ent.User.Query().WithRoles().Where(user.IDEQ(id)).Only(u.ctx)
+// SaveUser implements repositories.UserRepository.
+func (u Repo) SaveUser(ctx context.Context, data repository.SaveUserData) error {
+	exists, err := u.ent.User.Query().Where(user.Email(data.Email)).Exist(ctx)
 	if err != nil {
-		return appUser, err
+		return utils.NewRestErr(err)
 	}
+
+	if exists {
+		return utils.NewClientErr(utils.HTTPConflict, "Correo ya registrado")
+	}
+
+	hashedPass, err := bcrypt.GenerateFromPassword([]byte(data.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return utils.NewRestErr(err)
+	}
+
+	_, err = u.ent.User.
+		Create().
+		SetEmail(data.Email).
+		SetFirstName(data.FirstName).
+		SetLastName(data.LastName).
+		SetPassword(string(hashedPass)).
+		Save(ctx)
+
+	return utils.NewRestErr(err)
+}
+
+func (u Repo) GetUser(ctx context.Context, id uuid.UUID) (domain.User, error) {
+	var appUser domain.User
+
+	dbUser, err := u.ent.User.Query().WithRoles().Where(user.IDEQ(id)).Only(ctx)
+	if err != nil {
+		return appUser, utils.NewRestErr(err)
+	}
+
 	roles := make([]domain.Role, len(dbUser.Edges.Roles))
 	for i := range dbUser.Edges.Roles {
 		roles[i] = domain.RoleFromSting(dbUser.Edges.Roles[i].Name)
 	}
+
 	appUser = domain.User{
 		ID:        dbUser.ID,
 		FirstName: dbUser.FirstName,
@@ -40,5 +77,6 @@ func (u UserRepo) GetUser(id uuid.UUID) (domain.User, error) {
 			ArchivedAt: dbUser.ArchivedAt,
 		},
 	}
+
 	return appUser, nil
 }

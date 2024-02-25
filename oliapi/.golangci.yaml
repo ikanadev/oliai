@@ -1,0 +1,14 @@
+linters:
+  enable-all: true
+  disable:
+    - deadcode
+    - exhaustivestruct
+    - golint
+    - ifshort
+    - interfacer
+    - maligned
+    - nosnakecase
+    - depguard
+    - gci
+severity:
+  default-severity: warning
