@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	"errors"
 	"oliapi/domain"
 	"oliapi/domain/repository"
 	"oliapi/ent"
@@ -21,8 +22,31 @@ type Repo struct {
 }
 
 // VerifyUser implements repository.UserRepository.
-func (Repo) VerifyUser(ctx context.Context, email string, password string) (domain.User, error) {
-	panic("unimplemented")
+func (u Repo) VerifyUser(ctx context.Context, email string, password string) (domain.User, error) {
+	var respUser domain.User
+
+	dbUser, err := u.ent.User.Query().Where(user.Email(email)).First(ctx)
+	if err != nil {
+		var entNotFound *ent.NotFoundError
+
+		if errors.As(err, &entNotFound) {
+			return respUser, utils.NewClientErr(utils.HTTPUnauthorized, utils.ErrEmailNotRegistered)
+		}
+
+		return respUser, utils.NewRestErr(err)
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(dbUser.Password), []byte(password))
+	if err != nil {
+		return respUser, utils.NewClientErr(utils.HTTPUnauthorized, utils.ErrPasswordNotMatch)
+	}
+
+	respUser.ID = dbUser.ID
+	respUser.FirstName = dbUser.FirstName
+	respUser.LastName = dbUser.LastName
+	respUser.Email = dbUser.Email
+
+	return respUser, nil
 }
 
 // SaveUser implements repositories.UserRepository.
@@ -33,7 +57,7 @@ func (u Repo) SaveUser(ctx context.Context, data repository.SaveUserData) error 
 	}
 
 	if exists {
-		return utils.NewClientErr(utils.HTTPConflict, "Correo ya registrado")
+		return utils.NewClientErr(utils.HTTPConflict, utils.ErrEmailAlreadyRegistered)
 	}
 
 	hashedPass, err := bcrypt.GenerateFromPassword([]byte(data.Password), bcrypt.DefaultCost)
