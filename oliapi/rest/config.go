@@ -5,13 +5,14 @@ import "os"
 type Config struct {
 	Port   string
 	JWTKey []byte
-	DbConn string
+	DBConn string
 }
 
+//nolint:gochecknoglobals
 var _config = Config{
 	Port:   os.Getenv("PORT"),
 	JWTKey: []byte(os.Getenv("JWT_SIGN_KEY")),
-	DbConn: os.Getenv("DATABASE"),
+	DBConn: os.Getenv("DATABASE"),
 }
 
 func GetConfig() Config {

@@ -10,5 +10,6 @@ linters:
     - nosnakecase
     - depguard
     - gci
+    - wrapcheck
 severity:
   default-severity: warning

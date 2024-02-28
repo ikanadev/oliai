@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 	"errors"
+	"net/http"
 	"oliapi/domain"
 	"oliapi/domain/repository"
 	"oliapi/ent"
@@ -30,7 +31,7 @@ func (u Repo) VerifyUser(ctx context.Context, email string, password string) (do
 		var entNotFound *ent.NotFoundError
 
 		if errors.As(err, &entNotFound) {
-			return respUser, utils.NewClientErr(utils.HTTPUnauthorized, utils.ErrEmailNotRegistered)
+			return respUser, utils.NewClientErr(http.StatusUnauthorized, utils.ErrEmailNotRegistered)
 		}
 
 		return respUser, utils.NewRestErr(err)
@@ -38,7 +39,7 @@ func (u Repo) VerifyUser(ctx context.Context, email string, password string) (do
 
 	err = bcrypt.CompareHashAndPassword([]byte(dbUser.Password), []byte(password))
 	if err != nil {
-		return respUser, utils.NewClientErr(utils.HTTPUnauthorized, utils.ErrPasswordNotMatch)
+		return respUser, utils.NewClientErr(http.StatusUnauthorized, utils.ErrPasswordNotMatch)
 	}
 
 	respUser.ID = dbUser.ID
@@ -57,7 +58,7 @@ func (u Repo) SaveUser(ctx context.Context, data repository.SaveUserData) error 
 	}
 
 	if exists {
-		return utils.NewClientErr(utils.HTTPConflict, utils.ErrEmailAlreadyRegistered)
+		return utils.NewClientErr(http.StatusConflict, utils.ErrEmailAlreadyRegistered)
 	}
 
 	hashedPass, err := bcrypt.GenerateFromPassword([]byte(data.Password), bcrypt.DefaultCost)
@@ -84,17 +85,11 @@ func (u Repo) GetUser(ctx context.Context, id uuid.UUID) (domain.User, error) {
 		return appUser, utils.NewRestErr(err)
 	}
 
-	roles := make([]domain.Role, len(dbUser.Edges.Roles))
-	for i := range dbUser.Edges.Roles {
-		roles[i] = domain.RoleFromSting(dbUser.Edges.Roles[i].Name)
-	}
-
 	appUser = domain.User{
 		ID:        dbUser.ID,
 		FirstName: dbUser.FirstName,
 		LastName:  dbUser.LastName,
 		Email:     dbUser.Email,
-		Roles:     roles,
 		TimeData: domain.TimeData{
 			CreatedAt:  dbUser.CreatedAt,
 			UpdatedAt:  dbUser.UpdatedAt,
