@@ -1,16 +1,19 @@
 package rest
 
 import (
-	"context"
+	"errors"
 	"net/http"
 	"oliapi/domain/repository"
-	"oliapi/ent"
 	"oliapi/rest/user"
 
 	"github.com/go-playground/validator/v10"
+	"github.com/golang-migrate/migrate/v4"
+	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
 
 	// for postgres connection.
+	_ "github.com/golang-migrate/migrate/v4/database/postgres"
+	_ "github.com/golang-migrate/migrate/v4/source/github"
 	_ "github.com/lib/pq"
 )
 
@@ -30,7 +33,7 @@ type Server struct {
 	app      *echo.Echo
 	config   Config
 	userRepo repository.UserRepository
-	ent      *ent.Client
+	db       *sqlx.DB
 }
 
 func panicIfError(err error) {
@@ -39,30 +42,33 @@ func panicIfError(err error) {
 	}
 }
 
-func (s Server) Start() {
-	user.SetUpUserRoutes(s.app)
+func (s Server) Migrate() {
+	migrator, err := migrate.New(s.config.MigrationsURL, s.config.DBConn)
+	panicIfError(err)
 
+	err = migrator.Up()
+	if err != nil {
+		if !errors.Is(err, migrate.ErrNoChange) {
+			panicIfError(err)
+		}
+	}
+}
+
+func (s Server) Start() {
+	user.SetUpUserRoutes(s.app, s.userRepo)
 	panicIfError(s.app.Start(":" + s.config.Port))
 }
 
 func NewRestServer() Server {
 	var server Server
 	server.app = echo.New()
+	server.app.Debug = true
 	server.app.Validator = &echoValidator{
 		validator: validator.New(validator.WithRequiredStructEnabled()),
 	}
 	server.config = GetConfig()
-	ent, err := ent.Open("postgres", server.config.DBConn)
-	panicIfError(err)
-
-	ctx := context.Background()
-	err = ent.Schema.Create(ctx)
-	panicIfError(err)
-	err = populateStaticData(ctx, ent)
-	panicIfError(err)
-
-	server.ent = ent
-	server.userRepo = user.NewUserRepo(server.ent)
+	server.db = sqlx.MustConnect("postgres", server.config.DBConn)
+	server.userRepo = user.NewUserRepo()
 
 	return server
 }

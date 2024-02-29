@@ -4,6 +4,5 @@ type Company struct {
 	ID      string `json:"id"`
 	Name    string `json:"name"`
 	LogoURL string `json:"logoUrl"`
-	Email   string `json:"email"`
 	TimeData
 }
