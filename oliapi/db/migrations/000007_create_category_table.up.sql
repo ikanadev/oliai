@@ -1,0 +1,11 @@
+CREATE TABLE categories (
+	id UUID,
+	bot_id UUID NOT NULL,
+	name VARCHAR(255) NOT NULL,
+	created_at TIMESTAMP NOT NULL,
+	updated_at TIMESTAMP NOT NULL,
+	deleted_at TIMESTAMP DEFAULT NULL,
+	archived_at TIMESTAMP DEFAULT NULL,
+	FOREIGN KEY (bot_id) REFERENCES bots(id) ON DELETE CASCADE,
+	PRIMARY KEY (id)
+)
