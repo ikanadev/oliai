@@ -1,4 +1,4 @@
-package user
+package repo
 
 import (
 	"database/sql"
@@ -89,13 +89,21 @@ values ($1, $2, $3, $4, $5, $6, $7);`,
 	return nil
 }
 
-func (u Repo) GetUser(id uuid.UUID) (domain.User, error) {
-	var appUser domain.User
+func (u Repo) GetUser(userID uuid.UUID) (domain.User, error) {
+	var (
+		appUser domain.User
+		dbUser  db.User
+	)
 
-	err := u.db.Get(&appUser, "select * from users where id = $1;", id)
+	err := u.db.Get(&dbUser, "select * from users where id = $1;", userID)
 	if err != nil {
 		return appUser, err
 	}
+
+	appUser.ID = dbUser.ID
+	appUser.Email = dbUser.Email
+	appUser.FirstName = dbUser.FirstName
+	appUser.LastName = dbUser.LastName
 
 	return appUser, nil
 }

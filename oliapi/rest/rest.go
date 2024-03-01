@@ -2,13 +2,15 @@ package rest
 
 import (
 	"errors"
-	"net/http"
 	"oliapi/domain/repository"
-	"oliapi/rest/user"
+	"oliapi/rest/handler"
+	"oliapi/rest/repo"
+	"oliapi/rest/utils"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/jmoiron/sqlx"
+	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
 
 	// for postgres connection.
@@ -17,29 +19,30 @@ import (
 	_ "github.com/lib/pq"
 )
 
-type echoValidator struct {
-	validator *validator.Validate
-}
-
-func (e echoValidator) Validate(i any) error {
-	if err := e.validator.Struct(i); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+func NewRestServer() Server {
+	var server Server
+	server.config = GetConfig()
+	server.db = sqlx.MustConnect("postgres", server.config.DBConn)
+	server.app = echo.New()
+	server.app.Debug = true
+	server.app.Validator = &echoValidator{
+		validator: validator.New(validator.WithRequiredStructEnabled()),
 	}
+	server.protectedApp = server.app.Group("/api")
+	server.protectedApp.Use(echojwt.JWT(server.config.JWTKey), utils.UserIDMiddleware)
 
-	return nil
+	// repositories
+	server.userRepo = repo.NewUserRepo(server.db)
+
+	return server
 }
 
 type Server struct {
-	app      *echo.Echo
-	config   Config
-	userRepo repository.UserRepository
-	db       *sqlx.DB
-}
-
-func panicIfError(err error) {
-	if err != nil {
-		panic(err)
-	}
+	app          *echo.Echo
+	protectedApp *echo.Group
+	config       Config
+	userRepo     repository.UserRepository
+	db           *sqlx.DB
 }
 
 func (s Server) Migrate() {
@@ -55,22 +58,13 @@ func (s Server) Migrate() {
 }
 
 func (s Server) Start() {
-	user.SetUpUserRoutes(s.app, s.userRepo, string(s.config.JWTKey))
+	handler.SetUpAuthRoutes(s.app, s.userRepo, s.config.JWTKey)
+	handler.SetUpUserRoutes(s.protectedApp, s.userRepo, s.config.JWTKey)
 	panicIfError(s.app.Start(":" + s.config.Port))
 }
 
-func NewRestServer() Server {
-	var server Server
-	server.app = echo.New()
-	server.app.Debug = true
-	server.app.Validator = &echoValidator{
-		validator: validator.New(validator.WithRequiredStructEnabled()),
+func panicIfError(err error) {
+	if err != nil {
+		panic(err)
 	}
-	server.config = GetConfig()
-	server.db = sqlx.MustConnect("postgres", server.config.DBConn)
-
-	// repositories
-	server.userRepo = user.NewUserRepo(server.db)
-
-	return server
 }

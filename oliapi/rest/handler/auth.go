@@ -1,4 +1,4 @@
-package user
+package handler
 
 import (
 	"net/http"
@@ -9,7 +9,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func SetUpUserRoutes(app *echo.Echo, userRepo repository.UserRepository, jwtKey string) {
+func SetUpAuthRoutes(app *echo.Echo, userRepo repository.UserRepository, jwtKey []byte) {
 	app.POST("/signup", signUp(userRepo))
 	app.POST("/signin", signIn(userRepo, jwtKey))
 }
@@ -46,7 +46,7 @@ func signUp(userRepo repository.UserRepository) echo.HandlerFunc {
 	}
 }
 
-func signIn(userRepo repository.UserRepository, jwtKey string) echo.HandlerFunc {
+func signIn(userRepo repository.UserRepository, jwtKey []byte) echo.HandlerFunc {
 	type requestData struct {
 		Email    string `json:"email"    validate:"required,email"`
 		Password string `json:"password" validate:"required,max=255"`
@@ -72,7 +72,7 @@ func signIn(userRepo repository.UserRepository, jwtKey string) echo.HandlerFunc 
 			return err
 		}
 
-		token, err := utils.CreateToken(user.ID.String(), jwtKey)
+		token, err := utils.CreateToken(user.ID, jwtKey)
 		if err != nil {
 			return err
 		}
