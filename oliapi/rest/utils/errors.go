@@ -38,8 +38,9 @@ var ErrCanNotParseToken = errors.New("can not parse token. Claims to MapClaims")
 
 // expected errors.
 
-var ErrEmailAlreadyRegistered = errors.New("correo ya registrado")
-
-var ErrEmailNotRegistered = errors.New("correo no registrado")
-
-var ErrPasswordNotMatch = errors.New("contraseña incorrecta")
+const (
+	ErrEmailAlreadyRegistered = "email_already_registered"
+	ErrEmailIncorrect         = "email_incorrect"
+	ErrEmailNotRegistered     = "email_not_registered"
+	ErrPasswordIncorrect      = "password_incorrect"
+)

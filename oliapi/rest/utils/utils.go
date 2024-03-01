@@ -8,7 +8,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func createToken(id string, jwtKey string) (string, error) {
+func CreateToken(userID string, jwtKey string) (string, error) {
 	const validHours = 72
 
 	token := jwt.New(jwt.SigningMethodHS256)
@@ -18,10 +18,10 @@ func createToken(id string, jwtKey string) (string, error) {
 		return "", ErrCanNotParseToken
 	}
 
-	claims["id"] = id
+	claims["id"] = userID
 	claims["exp"] = time.Now().Add(time.Hour * validHours).Unix()
 
-	tokenStr, err := token.SignedString(jwtKey)
+	tokenStr, err := token.SignedString([]byte(jwtKey))
 	if err != nil {
 		return "", NewRestErr(err)
 	}
@@ -29,6 +29,6 @@ func createToken(id string, jwtKey string) (string, error) {
 	return tokenStr, nil
 }
 
-func authMiddleware(jwtKey string) echo.MiddlewareFunc {
+func AuthMiddleware(jwtKey string) echo.MiddlewareFunc {
 	return echojwt.JWT(jwtKey)
 }

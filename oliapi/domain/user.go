@@ -7,5 +7,4 @@ type User struct {
 	Email     string    `json:"email"`
 	FirstName string    `json:"name"`
 	LastName  string    `json:"lastName"`
-	TimeData
 }

@@ -9,9 +9,9 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func SetUpUserRoutes(app *echo.Echo, userRepo repository.UserRepository) {
+func SetUpUserRoutes(app *echo.Echo, userRepo repository.UserRepository, jwtKey string) {
 	app.POST("/signup", signUp(userRepo))
-	app.POST("/signin", signIn(userRepo))
+	app.POST("/signin", signIn(userRepo, jwtKey))
 }
 
 func signUp(userRepo repository.UserRepository) echo.HandlerFunc {
@@ -32,7 +32,7 @@ func signUp(userRepo repository.UserRepository) echo.HandlerFunc {
 			return err
 		}
 
-		err := userRepo.SaveUser(echoCtx.Request().Context(), repository.SaveUserData{
+		err := userRepo.SaveUser(repository.SaveUserData{
 			Email:     data.Email,
 			FirstName: data.FirstName,
 			LastName:  data.LastName,
@@ -46,11 +46,12 @@ func signUp(userRepo repository.UserRepository) echo.HandlerFunc {
 	}
 }
 
-func signIn(userRepo repository.UserRepository) echo.HandlerFunc {
+func signIn(userRepo repository.UserRepository, jwtKey string) echo.HandlerFunc {
 	type requestData struct {
 		Email    string `json:"email"    validate:"required,email"`
 		Password string `json:"password" validate:"required,max=255"`
 	}
+
 	type responseData struct {
 		User  domain.User `json:"user"`
 		Token string      `json:"token"`
@@ -59,18 +60,28 @@ func signIn(userRepo repository.UserRepository) echo.HandlerFunc {
 	return func(echoCtx echo.Context) error {
 		var data requestData
 		if err := echoCtx.Bind(&data); err != nil {
-			return utils.NewRestErr(err)
+			return err
 		}
 
 		if err := echoCtx.Validate(data); err != nil {
 			return err
 		}
 
-		user, err := userRepo.VerifyUser(echoCtx.Request().Context(), data.Email, data.Password)
+		user, err := userRepo.VerifyUser(data.Email, data.Password)
 		if err != nil {
 			return err
 		}
 
-		return echoCtx.JSON(http.StatusCreated, user)
+		token, err := utils.CreateToken(user.ID.String(), jwtKey)
+		if err != nil {
+			return err
+		}
+
+		resp := responseData{
+			User:  user,
+			Token: token,
+		}
+
+		return echoCtx.JSON(http.StatusCreated, resp)
 	}
 }

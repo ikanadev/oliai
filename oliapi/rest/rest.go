@@ -55,7 +55,7 @@ func (s Server) Migrate() {
 }
 
 func (s Server) Start() {
-	user.SetUpUserRoutes(s.app, s.userRepo)
+	user.SetUpUserRoutes(s.app, s.userRepo, string(s.config.JWTKey))
 	panicIfError(s.app.Start(":" + s.config.Port))
 }
 
@@ -68,7 +68,9 @@ func NewRestServer() Server {
 	}
 	server.config = GetConfig()
 	server.db = sqlx.MustConnect("postgres", server.config.DBConn)
-	server.userRepo = user.NewUserRepo()
+
+	// repositories
+	server.userRepo = user.NewUserRepo(server.db)
 
 	return server
 }
