@@ -1,30 +1,26 @@
 package domain
 
-type Role int
+type Role string
 
 const (
-	RoleAdmin Role = iota
-	RoleStaffAdmin
+	RoleAdmin Role = "admin"
+	//	RoleStaff users are OLIAI people that is in charge of manage company's bots.
+	//	Admin will assign companies to them.
+	RoleStaff Role = "staff"
+	//	RoleUser users are the company's designed "admin" from their bots.
+	//	So they can UPDATE company's bots, categories, documents.
+	RoleUser Role = "user"
 )
-
-func (r Role) String() string {
-	switch r {
-	case RoleAdmin:
-		return "admin"
-	case RoleStaffAdmin:
-		return "admin_staff"
-	}
-
-	return "unknown"
-}
 
 func RoleFromSting(s string) Role {
 	switch s {
 	case "admin":
 		return RoleAdmin
-	case "admin_staff":
-		return RoleStaffAdmin
+	case "staff":
+		return RoleStaff
+	case "user":
+		return RoleUser
 	}
 
-	return RoleStaffAdmin
+	return RoleUser
 }

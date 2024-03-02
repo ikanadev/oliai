@@ -1,18 +1,27 @@
 package rest
 
 import (
-	"context"
 	"oliapi/domain"
+
+	"github.com/google/uuid"
 )
 
-func populateStaticData(ctx context.Context) error {
+func (s Server) Populate() {
 	roles := []domain.Role{
 		domain.RoleAdmin,
-		domain.RoleStaffAdmin,
+		domain.RoleStaff,
+		domain.RoleUser,
 	}
+	sqlStatement := `
+insert into roles (id, name)
+select $1, $2
+where not exists (
+	select 1 from roles where name = $3
+);
+`
 
-	for _ = range roles {
+	for i := range roles {
+		_, err := s.db.Exec(sqlStatement, uuid.New(), roles[i], roles[i])
+		panicIfError(err)
 	}
-
-	return nil
 }
