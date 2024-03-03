@@ -1,4 +1,4 @@
-package handler
+package common
 
 import (
 	"net/http"
@@ -10,7 +10,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func SetUpUserRoutes(app *echo.Group, userRepo repository.UserRepository, jwtKey []byte) {
+func SetUpCommonRoutes(app *echo.Group, userRepo repository.UserRepository, jwtKey []byte) {
 	app.GET("/profile", getProfile(userRepo, jwtKey))
 }
 

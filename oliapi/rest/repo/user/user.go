@@ -1,4 +1,4 @@
-package repo
+package user
 
 import (
 	"database/sql"
@@ -60,6 +60,7 @@ func (u Repo) VerifyUser(email string, password string) (domain.User, error) {
 // SaveUser implements repositories.UserRepository.
 func (u Repo) SaveUser(data repository.SaveUserData) error {
 	var mails []string
+
 	now := time.Now()
 
 	err := u.db.Select(&mails, "select email from users where email = $1;", data.Email)

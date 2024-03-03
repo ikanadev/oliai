@@ -1,4 +1,4 @@
-package handler
+package public
 
 import (
 	"net/http"
@@ -8,11 +8,6 @@ import (
 
 	"github.com/labstack/echo/v4"
 )
-
-func SetUpAuthRoutes(app *echo.Echo, userRepo repository.UserRepository, jwtKey []byte) {
-	app.POST("/signup", signUp(userRepo))
-	app.POST("/signin", signIn(userRepo, jwtKey))
-}
 
 func signUp(userRepo repository.UserRepository) echo.HandlerFunc {
 	type requestData struct {

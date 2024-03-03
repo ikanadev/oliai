@@ -3,8 +3,10 @@ package rest
 import (
 	"errors"
 	"oliapi/domain/repository"
-	"oliapi/rest/handler"
-	"oliapi/rest/repo"
+	"oliapi/rest/handler/common"
+	"oliapi/rest/handler/public"
+	"oliapi/rest/repo/company"
+	"oliapi/rest/repo/user"
 	"oliapi/rest/utils"
 
 	"github.com/go-playground/validator/v10"
@@ -32,7 +34,8 @@ func NewRestServer() Server {
 	server.protectedApp.Use(echojwt.JWT(server.config.JWTKey), utils.UserIDMiddleware)
 
 	// repositories
-	server.userRepo = repo.NewUserRepo(server.db)
+	server.userRepo = user.NewUserRepo(server.db)
+	server.companyRepo = company.NewCompanyRepo(server.db)
 
 	return server
 }
@@ -42,6 +45,7 @@ type Server struct {
 	protectedApp *echo.Group
 	config       Config
 	userRepo     repository.UserRepository
+	companyRepo  repository.CompanyRepository
 	db           *sqlx.DB
 }
 
@@ -58,8 +62,8 @@ func (s Server) Migrate() {
 }
 
 func (s Server) Start() {
-	handler.SetUpAuthRoutes(s.app, s.userRepo, s.config.JWTKey)
-	handler.SetUpUserRoutes(s.protectedApp, s.userRepo, s.config.JWTKey)
+	public.SetUpPublicRoutes(s.app, s.userRepo, s.config.JWTKey)
+	common.SetUpCommonRoutes(s.protectedApp, s.userRepo, s.config.JWTKey)
 	panicIfError(s.app.Start(":" + s.config.Port))
 }
 
