@@ -49,7 +49,7 @@ type Bot struct {
 	CompanyID       uuid.UUID `db:"company_id"`
 	Name            string    `db:"name"`
 	GreetingMessage string    `db:"greeting_message"`
-	CustomPropmt    string    `db:"custom_prompt"`
+	CustomPrompt    string    `db:"custom_prompt"`
 	TimeFields
 }
 

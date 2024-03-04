@@ -6,6 +6,7 @@ import (
 	"oliapi/rest/handler/admin"
 	"oliapi/rest/handler/common"
 	"oliapi/rest/handler/public"
+	"oliapi/rest/repo/bot"
 	"oliapi/rest/repo/company"
 	"oliapi/rest/repo/user"
 	"oliapi/rest/utils"
@@ -37,6 +38,7 @@ func NewRestServer() Server {
 	// repositories
 	server.userRepo = user.NewUserRepo(server.db)
 	server.companyRepo = company.NewCompanyRepo(server.db)
+	server.botRepo = bot.NewBotRepo(server.db)
 
 	return server
 }
@@ -47,6 +49,7 @@ type Server struct {
 	config       Config
 	userRepo     repository.UserRepository
 	companyRepo  repository.CompanyRepository
+	botRepo      repository.BotRepository
 	db           *sqlx.DB
 }
 

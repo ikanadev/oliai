@@ -76,11 +76,8 @@ update companies set name=$1, logo_url=$2, deleted_at=$3, archived_at=$4, update
 		now,
 		data.ID,
 	)
-	if err != nil {
-		return err
-	}
 
-	return nil
+	return err
 }
 
 // SaveCompany implements repository.AdminRepository.
