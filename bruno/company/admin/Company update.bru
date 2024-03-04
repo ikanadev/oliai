@@ -1,0 +1,24 @@
+meta {
+  name: Company update
+  type: http
+  seq: 3
+}
+
+put {
+  url: {{base}}/api/admin/company/345bd328-d4db-487d-ba02-128da9926a9c
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{bearer_token}}
+}
+
+body:json {
+  {
+    "name": "BNB",
+    "logoUrl": "https://bnb.io/logo.svg",
+    "archive": true,
+    "delete": false
+  }
+}

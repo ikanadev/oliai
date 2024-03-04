@@ -1,12 +1,12 @@
 meta {
-  name: Company
+  name: Companies
   type: http
-  seq: 1
+  seq: 2
 }
 
-post {
+get {
   url: {{base}}/api/admin/company
-  body: json
+  body: none
   auth: bearer
 }
 
