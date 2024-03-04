@@ -12,4 +12,6 @@ func SetUpAdminRoutes(app *echo.Group, companyRepo repository.CompanyRepository,
 	adminApp := app.Group("/admin")
 	adminApp.Use(utils.AdminMiddleware(db))
 	adminApp.POST("/company", postCompany(companyRepo))
+	adminApp.GET("/company", getCompanies(companyRepo))
+	adminApp.PUT("/company/:id", updateCompany(companyRepo))
 }
