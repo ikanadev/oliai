@@ -11,5 +11,6 @@ linters:
     - depguard
     - gci
     - wrapcheck
+    - varnamelen
 severity:
   default-severity: warning
