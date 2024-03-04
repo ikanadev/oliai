@@ -16,11 +16,8 @@ func postCompany(companyRepo repository.CompanyRepository) echo.HandlerFunc {
 
 	return func(c echo.Context) error {
 		var data requestData
-		if err := c.Bind(&data); err != nil {
-			return utils.NewRestErr(err)
-		}
 
-		if err := c.Validate(data); err != nil {
+		if err := utils.BindAndValidate(c, &data); err != nil {
 			return err
 		}
 

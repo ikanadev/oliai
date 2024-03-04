@@ -17,13 +17,9 @@ func signUp(userRepo repository.UserRepository) echo.HandlerFunc {
 		Password  string `json:"password"  validate:"required,min=8,max=255"`
 	}
 
-	return func(echoCtx echo.Context) error {
+	return func(c echo.Context) error {
 		var data requestData
-		if err := echoCtx.Bind(&data); err != nil {
-			return utils.NewRestErr(err)
-		}
-
-		if err := echoCtx.Validate(data); err != nil {
+		if err := utils.BindAndValidate(c, &data); err != nil {
 			return err
 		}
 
@@ -37,7 +33,7 @@ func signUp(userRepo repository.UserRepository) echo.HandlerFunc {
 			return err
 		}
 
-		return echoCtx.JSON(http.StatusCreated, nil)
+		return c.JSON(http.StatusCreated, nil)
 	}
 }
 
@@ -52,13 +48,10 @@ func signIn(userRepo repository.UserRepository, jwtKey []byte) echo.HandlerFunc 
 		Token string      `json:"token"`
 	}
 
-	return func(echoCtx echo.Context) error {
+	return func(c echo.Context) error {
 		var data requestData
-		if err := echoCtx.Bind(&data); err != nil {
-			return err
-		}
 
-		if err := echoCtx.Validate(data); err != nil {
+		if err := utils.BindAndValidate(c, &data); err != nil {
 			return err
 		}
 
@@ -77,6 +70,6 @@ func signIn(userRepo repository.UserRepository, jwtKey []byte) echo.HandlerFunc 
 			Token: token,
 		}
 
-		return echoCtx.JSON(http.StatusCreated, resp)
+		return c.JSON(http.StatusCreated, resp)
 	}
 }
