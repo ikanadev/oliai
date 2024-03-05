@@ -68,7 +68,7 @@ func (s Server) Migrate() {
 func (s Server) Start() {
 	public.SetUpPublicRoutes(s.app, s.userRepo, s.config.JWTKey)
 	common.SetUpCommonRoutes(s.protectedApp, s.userRepo, s.config.JWTKey)
-	admin.SetUpAdminRoutes(s.protectedApp, s.companyRepo, s.db)
+	admin.SetUpAdminRoutes(s.protectedApp, s.companyRepo, s.botRepo, s.db)
 	panicIfError(s.app.Start(":" + s.config.Port))
 }
 

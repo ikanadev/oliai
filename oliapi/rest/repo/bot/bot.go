@@ -47,7 +47,7 @@ func (r Repo) GetBots(companyID uuid.UUID) ([]domain.BotWithTimeData, error) {
 		}
 	}
 
-	return nil, nil
+	return bots, nil
 }
 
 // SaveBot implements repository.BotRepository.
