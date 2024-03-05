@@ -1,0 +1,22 @@
+meta {
+  name: Bot
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{base}}/api/admin/company
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{bearer_token}}
+}
+
+body:json {
+  {
+    "name": "IBM",
+    "logoUrl": "https://imb.io/logo.svg"
+  }
+}

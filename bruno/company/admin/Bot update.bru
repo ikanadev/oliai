@@ -1,0 +1,25 @@
+meta {
+  name: Bot update
+  type: http
+  seq: 6
+}
+
+put {
+  url: {{base}}/api/admin/company/927a6190-0539-4c27-bb59-38c48fc9b9dd/bot/a7ea0558-1cb8-4225-a879-0f1446147e50
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{bearer_token}}
+}
+
+body:json {
+  {
+    "name": "Bot bnb internal",
+    "greetingMessage": "Hola, ¿cómo puedo ayudarte?",
+    "customPrompt": "Eres un asistente virtual interno.",
+    "archive": false,
+    "delete": true
+  }
+}
