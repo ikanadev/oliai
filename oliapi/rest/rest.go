@@ -1,7 +1,6 @@
 package rest
 
 import (
-	"errors"
 	"oliapi/domain/repository"
 	"oliapi/rest/handler/admin"
 	"oliapi/rest/handler/common"
@@ -11,13 +10,16 @@ import (
 	"oliapi/rest/repo/company"
 	"oliapi/rest/repo/document"
 	"oliapi/rest/repo/user"
+	"oliapi/rest/repo/vector"
 	"oliapi/rest/utils"
 
 	"github.com/go-playground/validator/v10"
-	"github.com/golang-migrate/migrate/v4"
 	"github.com/jmoiron/sqlx"
 	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
+	pb "github.com/qdrant/go-client/qdrant"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 
 	// for postgres connection.
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
@@ -27,8 +29,11 @@ import (
 
 func NewRestServer() Server {
 	var server Server
+	// config
 	server.config = GetConfig()
+	// db config
 	server.db = sqlx.MustConnect("postgres", server.config.DBConn)
+	// echo app
 	server.app = echo.New()
 	server.app.Debug = true
 	server.app.Validator = &echoValidator{
@@ -36,13 +41,18 @@ func NewRestServer() Server {
 	}
 	server.protectedApp = server.app.Group("/api")
 	server.protectedApp.Use(echojwt.JWT(server.config.JWTKey), utils.UserIDMiddleware)
+	// Qdrant
+	conn, err := grpc.Dial(server.config.QDrantURL, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	panicIfError(err)
 
+	server.grpc = conn
 	// repositories
 	server.userRepo = user.NewUserRepo(server.db)
 	server.companyRepo = company.NewCompanyRepo(server.db)
 	server.botRepo = bot.NewBotRepo(server.db)
 	server.categoryRepo = category.NewCategoryRepo(server.db)
 	server.documentRepo = document.NewDocumentRepo(server.db)
+	server.vectorRepo = vector.NewVectorRepo(server.qdrant)
 
 	return server
 }
@@ -56,19 +66,9 @@ type Server struct {
 	botRepo      repository.BotRepository
 	categoryRepo repository.CategoryRepository
 	documentRepo repository.DocumentRepository
+	vectorRepo   repository.VectorRepository
 	db           *sqlx.DB
-}
-
-func (s Server) Migrate() {
-	migrator, err := migrate.New(s.config.MigrationsURL, s.config.DBConn)
-	panicIfError(err)
-
-	err = migrator.Up()
-	if err != nil {
-		if !errors.Is(err, migrate.ErrNoChange) {
-			panicIfError(err)
-		}
-	}
+	grpc         *grpc.ClientConn
 }
 
 func (s Server) Start() {
