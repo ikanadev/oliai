@@ -7,7 +7,9 @@ import (
 	"oliapi/rest/handler/common"
 	"oliapi/rest/handler/public"
 	"oliapi/rest/repo/bot"
+	"oliapi/rest/repo/category"
 	"oliapi/rest/repo/company"
+	"oliapi/rest/repo/document"
 	"oliapi/rest/repo/user"
 	"oliapi/rest/utils"
 
@@ -39,6 +41,8 @@ func NewRestServer() Server {
 	server.userRepo = user.NewUserRepo(server.db)
 	server.companyRepo = company.NewCompanyRepo(server.db)
 	server.botRepo = bot.NewBotRepo(server.db)
+	server.categoryRepo = category.NewCategoryRepo(server.db)
+	server.documentRepo = document.NewDocumentRepo(server.db)
 
 	return server
 }
@@ -50,6 +54,8 @@ type Server struct {
 	userRepo     repository.UserRepository
 	companyRepo  repository.CompanyRepository
 	botRepo      repository.BotRepository
+	categoryRepo repository.CategoryRepository
+	documentRepo repository.DocumentRepository
 	db           *sqlx.DB
 }
 
@@ -68,7 +74,7 @@ func (s Server) Migrate() {
 func (s Server) Start() {
 	public.SetUpPublicRoutes(s.app, s.userRepo, s.config.JWTKey)
 	common.SetUpCommonRoutes(s.protectedApp, s.userRepo, s.config.JWTKey)
-	admin.SetUpAdminRoutes(s.protectedApp, s.companyRepo, s.botRepo, s.db)
+	admin.SetUpAdminRoutes(s.protectedApp, s.companyRepo, s.botRepo, s.categoryRepo, s.db)
 	panicIfError(s.app.Start(":" + s.config.Port))
 }
 

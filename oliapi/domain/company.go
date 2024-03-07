@@ -12,8 +12,3 @@ type CompanyWithTimeData struct {
 	Company
 	TimeData
 }
-
-type CompanyWithBots struct {
-	Company
-	Bots []BotWithCategories `json:"bots"`
-}
