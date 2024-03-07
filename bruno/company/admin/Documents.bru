@@ -1,0 +1,26 @@
+meta {
+  name: Documents
+  type: http
+  seq: 11
+}
+
+get {
+  url: {{base}}/api/admin/documents?categoryId=6ab7c66a-33ac-4795-9fd5-89c177ca9a5c
+  body: none
+  auth: bearer
+}
+
+query {
+  categoryId: 6ab7c66a-33ac-4795-9fd5-89c177ca9a5c
+}
+
+auth:bearer {
+  token: {{bearer_token}}
+}
+
+body:json {
+  {
+    "categoryId": "6ab7c66a-33ac-4795-9fd5-89c177ca9a5c",
+    "content": "este es un documento que va a ser tokenizado y parseado"
+  }
+}

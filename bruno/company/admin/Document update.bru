@@ -1,0 +1,23 @@
+meta {
+  name: Document update
+  type: http
+  seq: 12
+}
+
+put {
+  url: {{base}}/api/admin/documents/44c6dba5-9df7-4110-90a8-b2fc947c0384
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{bearer_token}}
+}
+
+body:json {
+  {
+    "content": "este es un documento que va a ser tokenizado y parseado",
+    "archive": true,
+    "delete": false
+  }
+}
