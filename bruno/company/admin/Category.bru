@@ -1,0 +1,22 @@
+meta {
+  name: Category
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{base}}/api/admin/categories
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{bearer_token}}
+}
+
+body:json {
+  {
+    "botId": "c3829dee-d2e1-44d8-ada4-7660f3628e09",
+    "name": "General information"
+  }
+}

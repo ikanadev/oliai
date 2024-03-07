@@ -1,11 +1,11 @@
 meta {
-  name: Company update
+  name: Category update
   type: http
-  seq: 3
+  seq: 9
 }
 
 put {
-  url: {{base}}/api/admin/companies/927a6190-0539-4c27-bb59-38c48fc9b9dd
+  url: {{base}}/api/admin/categories/6ab7c66a-33ac-4795-9fd5-89c177ca9a5c
   body: json
   auth: bearer
 }
@@ -16,8 +16,7 @@ auth:bearer {
 
 body:json {
   {
-    "name": "BNB",
-    "logoUrl": "https://bnb.io/logo.svg",
+    "name": "General information",
     "archive": true,
     "delete": false
   }
