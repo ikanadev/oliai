@@ -12,14 +12,18 @@ func SetUpAdminRoutes(
 	app *echo.Group,
 	companyRepo repository.CompanyRepository,
 	botRepo repository.BotRepository,
+	categoryRepo repository.CategoryRepository,
 	db *sqlx.DB,
 ) {
 	adminApp := app.Group("/admin")
 	adminApp.Use(utils.AdminMiddleware(db))
-	adminApp.POST("/company", postCompany(companyRepo))
-	adminApp.GET("/company", getCompanies(companyRepo))
-	adminApp.PUT("/company/:id", updateCompany(companyRepo))
-	adminApp.POST("/company/:id/bot", postBot(botRepo))
-	adminApp.GET("/company/:id/bot", getBots(botRepo))
-	adminApp.PUT("/company/:id/bot/:bot_id", updateBot(botRepo))
+	adminApp.POST("/companies", postCompany(companyRepo))
+	adminApp.GET("/companies", getCompanies(companyRepo))
+	adminApp.PUT("/companies/:id", updateCompany(companyRepo))
+	adminApp.POST("/bots", postBot(botRepo))
+	adminApp.GET("/bots", getBots(botRepo))
+	adminApp.PUT("/bots/:id", updateBot(botRepo))
+	adminApp.POST("/categories", postCategory(categoryRepo))
+	adminApp.GET("/categories", getCategories(categoryRepo))
+	adminApp.PUT("/categories/:id", updateCategory(categoryRepo))
 }

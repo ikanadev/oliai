@@ -44,11 +44,11 @@ func getCompanies(companyRepo repository.CompanyRepository) echo.HandlerFunc {
 
 func updateCompany(companyRepo repository.CompanyRepository) echo.HandlerFunc {
 	type requestData struct {
-		ID      string `param:"id"     validate:"required,uuid4"`
-		Name    string `json:"name"    validate:"required,min=3,max=255"`
-		LogoURL string `json:"logoUrl" validate:"required"`
-		Archive *bool  `json:"archive" validate:"required"`
-		Delete  *bool  `json:"delete"  validate:"required"`
+		ID      uuid.UUID `param:"id"     validate:"required,uuid4"`
+		Name    string    `json:"name"    validate:"required,min=3,max=255"`
+		LogoURL string    `json:"logoUrl" validate:"required"`
+		Archive *bool     `json:"archive" validate:"required"`
+		Delete  *bool     `json:"delete"  validate:"required"`
 	}
 
 	return func(c echo.Context) error {
@@ -58,13 +58,8 @@ func updateCompany(companyRepo repository.CompanyRepository) echo.HandlerFunc {
 			return err
 		}
 
-		companyID, err := uuid.Parse(data.ID)
-		if err != nil {
-			return err
-		}
-
-		err = companyRepo.UpdateCompany(repository.UpdateCompanyData{
-			ID:      companyID,
+		err := companyRepo.UpdateCompany(repository.UpdateCompanyData{
+			ID:      data.ID,
 			Name:    data.Name,
 			LogoURL: data.LogoURL,
 			Archive: *data.Archive,

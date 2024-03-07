@@ -11,8 +11,8 @@ import (
 
 func postBot(botRepo repository.BotRepository) echo.HandlerFunc {
 	type requestData struct {
-		Name      string `json:"name" validate:"required,min=3,max=255"`
-		CompanyID string `param:"id"  validate:"required,uuid4"`
+		Name      string    `json:"name"      validate:"required,min=3,max=255"`
+		CompanyID uuid.UUID `json:"companyId" validate:"required,uuid4"`
 	}
 
 	return func(c echo.Context) error {
@@ -21,12 +21,7 @@ func postBot(botRepo repository.BotRepository) echo.HandlerFunc {
 			return err
 		}
 
-		companyID, err := uuid.Parse(data.CompanyID)
-		if err != nil {
-			return err
-		}
-
-		err = botRepo.SaveBot(data.Name, companyID)
+		err := botRepo.SaveBot(data.Name, data.CompanyID)
 		if err != nil {
 			return err
 		}
@@ -37,12 +32,12 @@ func postBot(botRepo repository.BotRepository) echo.HandlerFunc {
 
 func updateBot(botRepo repository.BotRepository) echo.HandlerFunc {
 	type requestData struct {
-		BotID           string `param:"bot_id"         validate:"required,uuid4"`
-		Name            string `json:"name"            validate:"required,min=3,max=255"`
-		GreetingMessage string `json:"greetingMessage" validate:"required"`
-		CustomPrompt    string `json:"customPrompt"    validate:"required"`
-		Archive         *bool  `json:"archive"         validate:"required"`
-		Delete          *bool  `json:"delete"          validate:"required"`
+		BotID           uuid.UUID `param:"id"             validate:"required,uuid4"`
+		Name            string    `json:"name"            validate:"required,min=3,max=255"`
+		GreetingMessage string    `json:"greetingMessage" validate:"required"`
+		CustomPrompt    string    `json:"customPrompt"    validate:"required"`
+		Archive         *bool     `json:"archive"         validate:"required"`
+		Delete          *bool     `json:"delete"          validate:"required"`
 	}
 
 	return func(c echo.Context) error {
@@ -51,13 +46,8 @@ func updateBot(botRepo repository.BotRepository) echo.HandlerFunc {
 			return err
 		}
 
-		botID, err := uuid.Parse(data.BotID)
-		if err != nil {
-			return err
-		}
-
-		err = botRepo.UpdateBot(repository.UpdateBotData{
-			ID:              botID,
+		err := botRepo.UpdateBot(repository.UpdateBotData{
+			ID:              data.BotID,
 			Name:            data.Name,
 			GreetingMessage: data.GreetingMessage,
 			CustomPrompt:    data.CustomPrompt,
@@ -74,7 +64,7 @@ func updateBot(botRepo repository.BotRepository) echo.HandlerFunc {
 
 func getBots(botRepo repository.BotRepository) echo.HandlerFunc {
 	type requestData struct {
-		CompanyID string `param:"id" validate:"required,uuid4"`
+		CompanyID uuid.UUID `query:"companyId" validate:"required,uuid4"`
 	}
 
 	return func(c echo.Context) error {
@@ -83,12 +73,7 @@ func getBots(botRepo repository.BotRepository) echo.HandlerFunc {
 			return err
 		}
 
-		companyID, err := uuid.Parse(data.CompanyID)
-		if err != nil {
-			return err
-		}
-
-		bots, err := botRepo.GetBots(companyID)
+		bots, err := botRepo.GetBots(data.CompanyID)
 		if err != nil {
 			return err
 		}
