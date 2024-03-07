@@ -7,6 +7,7 @@ type Config struct {
 	JWTKey        []byte
 	DBConn        string
 	MigrationsURL string
+	QDrantURL     string
 }
 
 //nolint:gochecknoglobals
@@ -15,6 +16,7 @@ var _config = Config{
 	JWTKey:        []byte(os.Getenv("JWT_SIGN_KEY")),
 	DBConn:        os.Getenv("DATABASE"),
 	MigrationsURL: os.Getenv("MIGRATIONS_URL"),
+	QDrantURL:     os.Getenv("QDRANT_URL"),
 }
 
 func GetConfig() Config {
