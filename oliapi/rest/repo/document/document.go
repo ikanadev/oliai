@@ -45,14 +45,15 @@ func (r Repo) GetDocuments(categoryID uuid.UUID) ([]domain.DocumentWithTimeData,
 		}
 	}
 
-	return nil, nil
+	return documents, nil
 }
 
 // SaveDocument implements repository.DocumentRepository.
 func (r Repo) SaveDocument(categoryID uuid.UUID, content string) error {
 	now := time.Now()
 	sql := `
-		insert into documents (id, category_id, content, created_at, updated_at);
+		insert into documents (id, category_id, content, created_at, updated_at)
+		values ($1, $2, $3, $4, $5);
 	`
 
 	_, err := r.db.Exec(sql, uuid.New(), categoryID, content, now, now)

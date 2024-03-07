@@ -13,6 +13,7 @@ func SetUpAdminRoutes(
 	companyRepo repository.CompanyRepository,
 	botRepo repository.BotRepository,
 	categoryRepo repository.CategoryRepository,
+	documentRepo repository.DocumentRepository,
 	db *sqlx.DB,
 ) {
 	adminApp := app.Group("/admin")
@@ -26,4 +27,7 @@ func SetUpAdminRoutes(
 	adminApp.POST("/categories", postCategory(categoryRepo))
 	adminApp.GET("/categories", getCategories(categoryRepo))
 	adminApp.PUT("/categories/:id", updateCategory(categoryRepo))
+	adminApp.POST("/documents", postDocument(documentRepo))
+	adminApp.GET("/documents", getDocuments(documentRepo))
+	adminApp.PUT("/documents/:id", updateDocument(documentRepo))
 }
