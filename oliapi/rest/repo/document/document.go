@@ -18,6 +18,44 @@ type Repo struct {
 	db *sqlx.DB
 }
 
+// GetBot implements repository.DocumentRepository.
+func (r Repo) GetBot(documentID uuid.UUID) (domain.BotWithTimeData, error) {
+	var dbBot db.Bot
+
+	var bot domain.BotWithTimeData
+
+	sql := `
+		select * from bots where id in (
+			select bot_id from categories where id in (
+				select category_id from documents where id = $1
+			)
+		);
+	`
+
+	err := r.db.Get(&dbBot, sql, documentID)
+	if err != nil {
+		return bot, err
+	}
+
+	bot = domain.BotWithTimeData{
+		Bot: domain.Bot{
+			ID:              dbBot.ID,
+			Name:            dbBot.Name,
+			GreetingMessage: dbBot.GreetingMessage,
+			CustomPrompt:    dbBot.CustomPrompt,
+			EmbeddingModel:  domain.EmbeddingModel(dbBot.EmbeddingModel),
+		},
+		TimeData: domain.TimeData{
+			CreatedAt:  dbBot.CreatedAt,
+			UpdatedAt:  dbBot.UpdatedAt,
+			DeletedAt:  dbBot.DeletedAt,
+			ArchivedAt: dbBot.ArchivedAt,
+		},
+	}
+
+	return bot, nil
+}
+
 // GetDocuments implements repository.DocumentRepository.
 func (r Repo) GetDocuments(categoryID uuid.UUID) ([]domain.DocumentWithTimeData, error) {
 	var dbDocuments []db.Document
@@ -49,16 +87,17 @@ func (r Repo) GetDocuments(categoryID uuid.UUID) ([]domain.DocumentWithTimeData,
 }
 
 // SaveDocument implements repository.DocumentRepository.
-func (r Repo) SaveDocument(categoryID uuid.UUID, content string) error {
+func (r Repo) SaveDocument(categoryID uuid.UUID, content string) (uuid.UUID, error) {
 	now := time.Now()
+	id := uuid.New()
 	sql := `
 		insert into documents (id, category_id, content, created_at, updated_at)
 		values ($1, $2, $3, $4, $5);
 	`
 
-	_, err := r.db.Exec(sql, uuid.New(), categoryID, content, now, now)
+	_, err := r.db.Exec(sql, id, categoryID, content, now, now)
 
-	return err
+	return id, err
 }
 
 // UpdateDocument implements repository.DocumentRepository.

@@ -9,7 +9,11 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func postDocument(documentRepository repository.DocumentRepository) echo.HandlerFunc {
+func postDocument(
+	documentRepository repository.DocumentRepository,
+	vectorRepo repository.VectorRepository,
+	embeddingRepo repository.EmbeddingRepository,
+) echo.HandlerFunc {
 	type requestData struct {
 		CategoryID uuid.UUID `json:"categoryId" validate:"required,uuid4"`
 		Content    string    `json:"content"    validate:"required"`
@@ -21,7 +25,26 @@ func postDocument(documentRepository repository.DocumentRepository) echo.Handler
 			return err
 		}
 
-		err := documentRepository.SaveDocument(data.CategoryID, data.Content)
+		documentID, err := documentRepository.SaveDocument(data.CategoryID, data.Content)
+		if err != nil {
+			return err
+		}
+
+		bot, err := documentRepository.GetBot(documentID)
+		if err != nil {
+			return err
+		}
+
+		vector, err := embeddingRepo.EmbedContent(c.Request().Context(), bot.EmbeddingModel, data.Content)
+		if err != nil {
+			return err
+		}
+
+		err = vectorRepo.SaveVector(c.Request().Context(), repository.SaveVectorData{
+			BotID:      bot.ID,
+			DocumentID: documentID,
+			Vector:     vector,
+		})
 		if err != nil {
 			return err
 		}

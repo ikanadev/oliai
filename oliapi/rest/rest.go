@@ -2,6 +2,7 @@ package rest
 
 import (
 	"oliapi/domain/repository"
+	"oliapi/rest/config"
 	"oliapi/rest/handler/admin"
 	"oliapi/rest/handler/common"
 	"oliapi/rest/handler/public"
@@ -9,6 +10,7 @@ import (
 	"oliapi/rest/repo/category"
 	"oliapi/rest/repo/company"
 	"oliapi/rest/repo/document"
+	"oliapi/rest/repo/embedding"
 	"oliapi/rest/repo/user"
 	"oliapi/rest/repo/vector"
 	"oliapi/rest/utils"
@@ -29,7 +31,7 @@ import (
 func NewRestServer() Server {
 	var server Server
 	// config
-	server.config = GetConfig()
+	server.config = config.GetConfig()
 	// db config
 	server.db = sqlx.MustConnect("postgres", server.config.DBConn)
 	// echo app
@@ -52,28 +54,39 @@ func NewRestServer() Server {
 	server.categoryRepo = category.NewCategoryRepo(server.db)
 	server.documentRepo = document.NewDocumentRepo(server.db)
 	server.vectorRepo = vector.NewVectorRepo(server.grpc)
+	server.embeddingRepo = embedding.NewEmbeddingRepo()
 
 	return server
 }
 
 type Server struct {
-	app          *echo.Echo
-	protectedApp *echo.Group
-	config       Config
-	userRepo     repository.UserRepository
-	companyRepo  repository.CompanyRepository
-	botRepo      repository.BotRepository
-	categoryRepo repository.CategoryRepository
-	documentRepo repository.DocumentRepository
-	vectorRepo   repository.VectorRepository
-	db           *sqlx.DB
-	grpc         *grpc.ClientConn
+	app           *echo.Echo
+	protectedApp  *echo.Group
+	config        config.Config
+	userRepo      repository.UserRepository
+	companyRepo   repository.CompanyRepository
+	botRepo       repository.BotRepository
+	categoryRepo  repository.CategoryRepository
+	documentRepo  repository.DocumentRepository
+	vectorRepo    repository.VectorRepository
+	embeddingRepo repository.EmbeddingRepository
+	db            *sqlx.DB
+	grpc          *grpc.ClientConn
 }
 
 func (s Server) Start() {
 	public.SetUpPublicRoutes(s.app, s.userRepo, s.config.JWTKey)
 	common.SetUpCommonRoutes(s.protectedApp, s.userRepo, s.config.JWTKey)
-	admin.SetUpAdminRoutes(s.protectedApp, s.companyRepo, s.botRepo, s.categoryRepo, s.documentRepo, s.vectorRepo, s.db)
+	admin.SetUpAdminRoutes(
+		s.protectedApp,
+		s.companyRepo,
+		s.botRepo,
+		s.categoryRepo,
+		s.documentRepo,
+		s.vectorRepo,
+		s.embeddingRepo,
+		s.db,
+	)
 	panicIfError(s.app.Start(":" + s.config.Port))
 }
 
