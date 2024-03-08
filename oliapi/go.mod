@@ -12,6 +12,7 @@ require (
 	github.com/labstack/echo/v4 v4.11.4
 	github.com/lib/pq v1.10.9
 	github.com/qdrant/go-client v1.8.0
+	github.com/sashabaranov/go-openai v1.20.2
 	golang.org/x/crypto v0.21.0
 	google.golang.org/grpc v1.59.0
 )

@@ -91,6 +91,8 @@ github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZb
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/qdrant/go-client v1.8.0 h1:DejrOJ5BWO76QdyxibUtAVkWgEaWCOZDui5PV0sb48c=
 github.com/qdrant/go-client v1.8.0/go.mod h1:680gkxNAsVtre0Z8hAQmtPzJtz1xFAyCu2TUxULtnoE=
+github.com/sashabaranov/go-openai v1.20.2 h1:nilzF2EKzaHyK4Rk2Dbu/aJEZbtIvskDIXvfS4yx+6M=
+github.com/sashabaranov/go-openai v1.20.2/go.mod h1:lj5b/K+zjTSFxVLijLSTDZuP7adOgerWeFyZLUhAKRg=
 github.com/stretchr/testify v1.8.4 h1:CcVxjf3Q8PM0mHUKJCdn+eZZtm5yQwehR5yeSVQQcUk=
 github.com/stretchr/testify v1.8.4/go.mod h1:sz/lmYIOXD/1dqDmKjjqLyZ2RngseejIcXlSw2iwfAo=
 github.com/valyala/bytebufferpool v1.0.0 h1:GqA5TC/0021Y/b9FG4Oi9Mr3q7XYx6KllzawFIhcdPw=
