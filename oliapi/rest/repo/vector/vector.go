@@ -2,6 +2,7 @@ package vector
 
 import (
 	"context"
+	"oliapi/domain"
 	"oliapi/domain/repository"
 
 	"github.com/google/uuid"
@@ -9,10 +10,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-const (
-	vectorSize     = 1536
-	vectorDistance = pb.Distance_Cosine
-)
+const vectorDistance = pb.Distance_Cosine
 
 func NewVectorRepo(grpc *grpc.ClientConn) Repo {
 	return Repo{
@@ -54,7 +52,7 @@ func (r Repo) SaveVector(ctx context.Context, data repository.SaveVectorData) er
 }
 
 // CreateCollection implements repository.VectorRepository.
-func (r Repo) CreateCollection(ctx context.Context, botID uuid.UUID) error {
+func (r Repo) CreateCollection(ctx context.Context, botID uuid.UUID, embeddingProvider domain.EmbeddingProvider) error {
 	collectionsClient := pb.NewCollectionsClient(r.grpc)
 	_, err := collectionsClient.Create(
 		ctx,
@@ -63,7 +61,7 @@ func (r Repo) CreateCollection(ctx context.Context, botID uuid.UUID) error {
 			VectorsConfig: &pb.VectorsConfig{
 				Config: &pb.VectorsConfig_Params{
 					Params: &pb.VectorParams{ //nolint:exhaustruct
-						Size:     vectorSize,
+						Size:     uint64(embeddingProvider.VectorSize),
 						Distance: vectorDistance,
 					},
 				},

@@ -17,7 +17,6 @@ import (
 	"github.com/jmoiron/sqlx"
 	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
-	pb "github.com/qdrant/go-client/qdrant"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
@@ -52,7 +51,7 @@ func NewRestServer() Server {
 	server.botRepo = bot.NewBotRepo(server.db)
 	server.categoryRepo = category.NewCategoryRepo(server.db)
 	server.documentRepo = document.NewDocumentRepo(server.db)
-	server.vectorRepo = vector.NewVectorRepo(server.qdrant)
+	server.vectorRepo = vector.NewVectorRepo(server.grpc)
 
 	return server
 }
@@ -74,7 +73,7 @@ type Server struct {
 func (s Server) Start() {
 	public.SetUpPublicRoutes(s.app, s.userRepo, s.config.JWTKey)
 	common.SetUpCommonRoutes(s.protectedApp, s.userRepo, s.config.JWTKey)
-	admin.SetUpAdminRoutes(s.protectedApp, s.companyRepo, s.botRepo, s.categoryRepo, s.documentRepo, s.db)
+	admin.SetUpAdminRoutes(s.protectedApp, s.companyRepo, s.botRepo, s.categoryRepo, s.documentRepo, s.vectorRepo, s.db)
 	panicIfError(s.app.Start(":" + s.config.Port))
 }
 

@@ -2,6 +2,7 @@ package admin
 
 import (
 	"net/http"
+	"oliapi/domain"
 	"oliapi/domain/repository"
 	"oliapi/rest/utils"
 
@@ -9,7 +10,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func postBot(botRepo repository.BotRepository) echo.HandlerFunc {
+func postBot(botRepo repository.BotRepository, vectorRepo repository.VectorRepository) echo.HandlerFunc {
 	type requestData struct {
 		Name      string    `json:"name"      validate:"required,min=3,max=255"`
 		CompanyID uuid.UUID `json:"companyId" validate:"required,uuid4"`
@@ -21,7 +22,15 @@ func postBot(botRepo repository.BotRepository) echo.HandlerFunc {
 			return err
 		}
 
-		err := botRepo.SaveBot(data.Name, data.CompanyID)
+		// TODO: add embedding model to the parameters
+		embeddingProvider := domain.EmbeddingOpenAI3Small
+
+		botID, err := botRepo.SaveBot(data.Name, data.CompanyID, embeddingProvider.Model)
+		if err != nil {
+			return err
+		}
+
+		err = vectorRepo.CreateCollection(c.Request().Context(), botID, embeddingProvider)
 		if err != nil {
 			return err
 		}

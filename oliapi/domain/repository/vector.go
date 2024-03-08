@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"oliapi/domain"
 
 	"github.com/google/uuid"
 )
@@ -13,6 +14,6 @@ type SaveVectorData struct {
 }
 
 type VectorRepository interface {
-	CreateCollection(ctx context.Context, botID uuid.UUID) error
+	CreateCollection(ctx context.Context, botID uuid.UUID, provider domain.EmbeddingProvider) error
 	SaveVector(ctx context.Context, data SaveVectorData) error
 }

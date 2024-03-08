@@ -14,6 +14,7 @@ func SetUpAdminRoutes(
 	botRepo repository.BotRepository,
 	categoryRepo repository.CategoryRepository,
 	documentRepo repository.DocumentRepository,
+	vectorRepo repository.VectorRepository,
 	db *sqlx.DB,
 ) {
 	adminApp := app.Group("/admin")
@@ -21,7 +22,7 @@ func SetUpAdminRoutes(
 	adminApp.POST("/companies", postCompany(companyRepo))
 	adminApp.GET("/companies", getCompanies(companyRepo))
 	adminApp.PUT("/companies/:id", updateCompany(companyRepo))
-	adminApp.POST("/bots", postBot(botRepo))
+	adminApp.POST("/bots", postBot(botRepo, vectorRepo))
 	adminApp.GET("/bots", getBots(botRepo))
 	adminApp.PUT("/bots/:id", updateBot(botRepo))
 	adminApp.POST("/categories", postCategory(categoryRepo))

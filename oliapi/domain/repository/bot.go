@@ -16,7 +16,7 @@ type UpdateBotData struct {
 }
 
 type BotRepository interface {
-	SaveBot(name string, companyID uuid.UUID) error
+	SaveBot(name string, companyID uuid.UUID, model domain.EmbeddingModel) (uuid.UUID, error)
 	GetBots(companyID uuid.UUID) ([]domain.BotWithTimeData, error)
 	UpdateBot(data UpdateBotData) error
 }

@@ -35,6 +35,7 @@ func (r Repo) GetBots(companyID uuid.UUID) ([]domain.BotWithTimeData, error) {
 			Bot: domain.Bot{
 				ID:              dbBot.ID,
 				Name:            dbBot.Name,
+				EmbeddingModel:  domain.EmbeddingModel(dbBot.EmbeddingModel),
 				GreetingMessage: dbBot.GreetingMessage,
 				CustomPrompt:    dbBot.CustomPrompt,
 			},
@@ -51,21 +52,22 @@ func (r Repo) GetBots(companyID uuid.UUID) ([]domain.BotWithTimeData, error) {
 }
 
 // SaveBot implements repository.BotRepository.
-func (r Repo) SaveBot(name string, companyID uuid.UUID) error {
+func (r Repo) SaveBot(name string, companyID uuid.UUID, model domain.EmbeddingModel) (uuid.UUID, error) {
 	const (
 		defaultGreetingMessage = "Hola, ¿cómo puedo ayudarte?"
 		defaultCustomPrompt    = "Eres un asistente virtual."
 	)
 
+	uuid := uuid.New()
 	now := time.Now()
 	sql := `
-		INSERT INTO bots (id, company_id, name, greeting_message, custom_prompt, created_at, updated_at)
-		VALUES ($1, $2, $3, $4, $5, $6, $7);
+		INSERT INTO bots (id, company_id, name, embedding_model, greeting_message, custom_prompt, created_at, updated_at)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8);
 	`
 
-	_, err := r.db.Exec(sql, uuid.New(), companyID, name, defaultGreetingMessage, defaultCustomPrompt, now, now)
+	_, err := r.db.Exec(sql, uuid, companyID, name, model, defaultGreetingMessage, defaultCustomPrompt, now, now)
 
-	return err
+	return uuid, err
 }
 
 // UpdateBot implements repository.BotRepository.

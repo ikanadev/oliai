@@ -3,10 +3,11 @@ package domain
 import "github.com/google/uuid"
 
 type Bot struct {
-	ID              uuid.UUID `json:"id"`
-	Name            string    `json:"name"`
-	GreetingMessage string    `json:"greetingMessage"`
-	CustomPrompt    string    `json:"customPrompt"`
+	ID              uuid.UUID      `json:"id"`
+	Name            string         `json:"name"`
+	GreetingMessage string         `json:"greetingMessage"`
+	CustomPrompt    string         `json:"customPrompt"`
+	EmbeddingModel  EmbeddingModel `json:"embeddingModel"`
 }
 
 type BotWithTimeData struct {

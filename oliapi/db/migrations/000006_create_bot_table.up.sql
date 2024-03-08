@@ -2,6 +2,7 @@ CREATE TABLE bots (
 	id UUID,
 	company_id UUID NOT NULL,
 	name VARCHAR(255) NOT NULL,
+	embedding_model VARCHAR(255) NOT NULL,
 	greeting_message TEXT NOT NULL,
 	custom_prompt TEXT NOT NULL,
 	created_at TIMESTAMP NOT NULL,

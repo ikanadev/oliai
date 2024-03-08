@@ -50,6 +50,7 @@ type Bot struct {
 	Name            string    `db:"name"`
 	GreetingMessage string    `db:"greeting_message"`
 	CustomPrompt    string    `db:"custom_prompt"`
+	EmbeddingModel  string    `db:"embedding_model"`
 	TimeFields
 }
 
