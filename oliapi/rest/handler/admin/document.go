@@ -10,6 +10,42 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+func embeddDocument(
+	documentRepository repository.DocumentRepository,
+	embeddingRepo repository.EmbeddingRepository,
+	vectorRepo repository.VectorRepository,
+) echo.HandlerFunc {
+	type requestData struct {
+		DocumentID uuid.UUID `param:"id" validate:"required,uuid4"`
+	}
+
+	return func(c echo.Context) error {
+		var data requestData
+		if err := utils.BindAndValidate(c, &data); err != nil {
+			return err
+		}
+
+		document, err := documentRepository.GetDocument(data.DocumentID)
+		if err != nil {
+			return err
+		}
+
+		err = embeddSingleDocument(
+			c.Request().Context(),
+			document.ID,
+			document.Content,
+			documentRepository,
+			embeddingRepo,
+			vectorRepo,
+		)
+		if err != nil {
+			return err
+		}
+
+		return c.NoContent(http.StatusOK)
+	}
+}
+
 func postDocument(
 	documentRepository repository.DocumentRepository,
 	vectorRepo repository.VectorRepository,
@@ -31,7 +67,14 @@ func postDocument(
 			return err
 		}
 
-		err = embeddDocument(c.Request().Context(), documentID, data.Content, documentRepository, embeddingRepo, vectorRepo)
+		err = embeddSingleDocument(
+			c.Request().Context(),
+			documentID,
+			data.Content,
+			documentRepository,
+			embeddingRepo,
+			vectorRepo,
+		)
 		if err != nil {
 			return err
 		}
@@ -102,7 +145,14 @@ func updateDocument(
 		}
 
 		if shouldEmbedd {
-			err := embeddDocument(c.Request().Context(), doc.ID, data.Content, documentRepository, embeddingRepo, vectorRepo)
+			err := embeddSingleDocument(
+				c.Request().Context(),
+				doc.ID,
+				data.Content,
+				documentRepository,
+				embeddingRepo,
+				vectorRepo,
+			)
 			if err != nil {
 				return err
 			}
@@ -112,7 +162,7 @@ func updateDocument(
 	}
 }
 
-func embeddDocument(
+func embeddSingleDocument(
 	ctx context.Context,
 	documentID uuid.UUID,
 	content string,

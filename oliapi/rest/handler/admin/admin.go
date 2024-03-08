@@ -32,4 +32,5 @@ func SetUpAdminRoutes(
 	adminApp.POST("/documents", postDocument(documentRepo, vectorRepo, embeddingRepo))
 	adminApp.GET("/documents", getDocuments(documentRepo))
 	adminApp.PUT("/documents/:id", updateDocument(documentRepo, embeddingRepo, vectorRepo))
+	adminApp.GET("/documents/:id/embedd", embeddDocument(documentRepo, embeddingRepo, vectorRepo))
 }
