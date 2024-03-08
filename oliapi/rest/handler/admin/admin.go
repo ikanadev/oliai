@@ -31,5 +31,5 @@ func SetUpAdminRoutes(
 	adminApp.PUT("/categories/:id", updateCategory(categoryRepo))
 	adminApp.POST("/documents", postDocument(documentRepo, vectorRepo, embeddingRepo))
 	adminApp.GET("/documents", getDocuments(documentRepo))
-	adminApp.PUT("/documents/:id", updateDocument(documentRepo))
+	adminApp.PUT("/documents/:id", updateDocument(documentRepo, embeddingRepo, vectorRepo))
 }

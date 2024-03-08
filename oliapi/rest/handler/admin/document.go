@@ -1,6 +1,7 @@
 package admin
 
 import (
+	"context"
 	"net/http"
 	"oliapi/domain/repository"
 	"oliapi/rest/utils"
@@ -30,21 +31,7 @@ func postDocument(
 			return err
 		}
 
-		bot, err := documentRepository.GetBot(documentID)
-		if err != nil {
-			return err
-		}
-
-		vector, err := embeddingRepo.EmbedContent(c.Request().Context(), bot.EmbeddingModel, data.Content)
-		if err != nil {
-			return err
-		}
-
-		err = vectorRepo.SaveVector(c.Request().Context(), repository.SaveVectorData{
-			BotID:      bot.ID,
-			DocumentID: documentID,
-			Vector:     vector,
-		})
+		err = embeddDocument(c.Request().Context(), documentID, data.Content, documentRepository, embeddingRepo, vectorRepo)
 		if err != nil {
 			return err
 		}
@@ -73,7 +60,11 @@ func getDocuments(documentRepository repository.DocumentRepository) echo.Handler
 	}
 }
 
-func updateDocument(documentRepository repository.DocumentRepository) echo.HandlerFunc {
+func updateDocument(
+	documentRepository repository.DocumentRepository,
+	embeddingRepo repository.EmbeddingRepository,
+	vectorRepo repository.VectorRepository,
+) echo.HandlerFunc {
 	type requestData struct {
 		DocumentID uuid.UUID `param:"id"     validate:"required,uuid4"`
 		Content    string    `json:"content" validate:"required"`
@@ -82,12 +73,25 @@ func updateDocument(documentRepository repository.DocumentRepository) echo.Handl
 	}
 
 	return func(c echo.Context) error {
-		var data requestData
+		var (
+			data         requestData
+			shouldEmbedd = false
+		)
+
 		if err := utils.BindAndValidate(c, &data); err != nil {
 			return err
 		}
 
-		err := documentRepository.UpdateDocument(repository.UpdateDocumentData{
+		doc, err := documentRepository.GetDocument(data.DocumentID)
+		if err != nil {
+			return err
+		}
+
+		if doc.Content != data.Content {
+			shouldEmbedd = true
+		}
+
+		err = documentRepository.UpdateDocument(repository.UpdateDocumentData{
 			ID:      data.DocumentID,
 			Content: data.Content,
 			Archive: *data.Archive,
@@ -97,6 +101,43 @@ func updateDocument(documentRepository repository.DocumentRepository) echo.Handl
 			return err
 		}
 
-		return nil
+		if shouldEmbedd {
+			err := embeddDocument(c.Request().Context(), doc.ID, data.Content, documentRepository, embeddingRepo, vectorRepo)
+			if err != nil {
+				return err
+			}
+		}
+
+		return c.NoContent(http.StatusOK)
 	}
+}
+
+func embeddDocument(
+	ctx context.Context,
+	documentID uuid.UUID,
+	content string,
+	documentRepository repository.DocumentRepository,
+	embeddingRepo repository.EmbeddingRepository,
+	vectorRepo repository.VectorRepository,
+) error {
+	bot, err := documentRepository.GetBot(documentID)
+	if err != nil {
+		return err
+	}
+
+	vector, err := embeddingRepo.EmbedContent(ctx, bot.EmbeddingModel, content)
+	if err != nil {
+		return err
+	}
+
+	err = vectorRepo.SaveVector(ctx, repository.SaveVectorData{
+		BotID:      bot.ID,
+		DocumentID: documentID,
+		Vector:     vector,
+	})
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

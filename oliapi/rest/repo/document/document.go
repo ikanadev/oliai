@@ -1,6 +1,8 @@
 package document
 
 import (
+	"database/sql"
+	"errors"
 	"oliapi/db"
 	"oliapi/domain"
 	"oliapi/domain/repository"
@@ -8,6 +10,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
+	"github.com/labstack/echo/v4"
 )
 
 func NewDocumentRepo(db *sqlx.DB) Repo {
@@ -16,6 +19,40 @@ func NewDocumentRepo(db *sqlx.DB) Repo {
 
 type Repo struct {
 	db *sqlx.DB
+}
+
+// GetDocument implements repository.DocumentRepository.
+func (r Repo) GetDocument(documentID uuid.UUID) (domain.DocumentWithTimeData, error) {
+	var (
+		dbDocument db.Document
+		document   domain.DocumentWithTimeData
+	)
+
+	sqlQuery := "select * from documents where id = $1;"
+
+	err := r.db.Get(&dbDocument, sqlQuery, documentID)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return document, echo.ErrNotFound
+		}
+
+		return document, err
+	}
+
+	document = domain.DocumentWithTimeData{
+		Document: domain.Document{
+			ID:      dbDocument.ID,
+			Content: dbDocument.Content,
+		},
+		TimeData: domain.TimeData{
+			CreatedAt:  dbDocument.CreatedAt,
+			UpdatedAt:  dbDocument.UpdatedAt,
+			DeletedAt:  dbDocument.DeletedAt,
+			ArchivedAt: dbDocument.ArchivedAt,
+		},
+	}
+
+	return document, nil
 }
 
 // GetBot implements repository.DocumentRepository.

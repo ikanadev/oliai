@@ -15,7 +15,7 @@ func embedWithOpenAIText3Small(ctx context.Context, content string) ([]float32, 
 		Model: openai.SmallEmbedding3,
 	}
 
-	queryResp, err := client.CreateEmbeddings(context.Background(), queryReq)
+	queryResp, err := client.CreateEmbeddings(ctx, queryReq)
 	if err != nil {
 		return nil, err
 	}
@@ -31,7 +31,7 @@ func embedWithOpenAIText3Large(ctx context.Context, content string) ([]float32, 
 		Model: openai.LargeEmbedding3,
 	}
 
-	queryResp, err := client.CreateEmbeddings(context.Background(), queryReq)
+	queryResp, err := client.CreateEmbeddings(ctx, queryReq)
 	if err != nil {
 		return nil, err
 	}
