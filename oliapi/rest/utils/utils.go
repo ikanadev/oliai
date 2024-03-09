@@ -31,9 +31,7 @@ func BindAndValidate[T any](c echo.Context, target *T) error {
 		return echo.ErrUnprocessableEntity
 	}
 
-	if err := c.Validate(*target); err != nil {
-		return err
-	}
+	err := c.Validate(*target)
 
-	return nil
+	return err
 }

@@ -83,11 +83,8 @@ insert into users
 values ($1, $2, $3, $4, $5, $6, $7);`,
 		uuid.New(), data.Email, data.FirstName, data.LastName, hashedPassword, now, now,
 	)
-	if err != nil {
-		return err
-	}
 
-	return nil
+	return err
 }
 
 func (u Repo) GetUser(userID uuid.UUID) (domain.User, error) {

@@ -190,9 +190,6 @@ func embeddSingleDocument(
 	}
 
 	err = documentRepository.UpdateEmbeddingDate(documentID)
-	if err != nil {
-		return err
-	}
 
-	return nil
+	return err
 }
