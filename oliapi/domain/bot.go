@@ -1,6 +1,10 @@
 package domain
 
-import "github.com/google/uuid"
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
 
 type Bot struct {
 	ID              uuid.UUID      `json:"id"`
@@ -28,8 +32,9 @@ type CategoryWithTimeData struct {
 
 // store a piece of block info to be embedded.
 type Document struct {
-	ID      uuid.UUID `json:"id"`
-	Content string    `json:"content"`
+	ID            uuid.UUID `json:"id"`
+	Content       string    `json:"content"`
+	EmbeddingDate *time.Time `json:"embeddingDate"`
 }
 
 type DocumentWithTimeData struct {

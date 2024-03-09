@@ -62,8 +62,9 @@ type Category struct {
 }
 
 type Document struct {
-	ID         uuid.UUID `db:"id"`
-	CategoryID uuid.UUID `db:"category_id"`
-	Content    string    `db:"content"`
+	ID            uuid.UUID  `db:"id"`
+	CategoryID    uuid.UUID  `db:"category_id"`
+	Content       string     `db:"content"`
+	EmbeddingDate *time.Time `db:"embedding_date"`
 	TimeFields
 }

@@ -18,5 +18,6 @@ type DocumentRepository interface {
 	GetDocuments(categoryID uuid.UUID) ([]domain.DocumentWithTimeData, error)
 	GetDocument(documentID uuid.UUID) (domain.DocumentWithTimeData, error)
 	UpdateDocument(data UpdateDocumentData) error
+	UpdateEmbeddingDate(documentID uuid.UUID) error
 	GetBot(documentID uuid.UUID) (domain.BotWithTimeData, error)
 }

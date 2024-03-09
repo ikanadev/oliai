@@ -41,8 +41,9 @@ func (r Repo) GetDocument(documentID uuid.UUID) (domain.DocumentWithTimeData, er
 
 	document = domain.DocumentWithTimeData{
 		Document: domain.Document{
-			ID:      dbDocument.ID,
-			Content: dbDocument.Content,
+			ID:            dbDocument.ID,
+			Content:       dbDocument.Content,
+			EmbeddingDate: dbDocument.EmbeddingDate,
 		},
 		TimeData: domain.TimeData{
 			CreatedAt:  dbDocument.CreatedAt,
@@ -108,8 +109,9 @@ func (r Repo) GetDocuments(categoryID uuid.UUID) ([]domain.DocumentWithTimeData,
 		dbDoc := dbDocuments[i]
 		documents[i] = domain.DocumentWithTimeData{
 			Document: domain.Document{
-				ID:      dbDoc.ID,
-				Content: dbDoc.Content,
+				ID:            dbDoc.ID,
+				Content:       dbDoc.Content,
+				EmbeddingDate: dbDoc.EmbeddingDate,
 			},
 			TimeData: domain.TimeData{
 				CreatedAt:  dbDoc.CreatedAt,
@@ -162,6 +164,15 @@ func (r Repo) UpdateDocument(data repository.UpdateDocumentData) error {
 		now,
 		data.ID,
 	)
+
+	return err
+}
+
+// UpdateEmbeddingDate implements repository.DocumentRepository.
+func (r Repo) UpdateEmbeddingDate(documentID uuid.UUID) error {
+	now := time.Now()
+	sql := "update documents set embedding_date=$1 where id=$2;"
+	_, err := r.db.Exec(sql, &now, documentID)
 
 	return err
 }
