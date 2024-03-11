@@ -9,14 +9,20 @@ export const router = createRouter({
 			name: "home",
 		},
 		{
-			path: "/signup",
-			component: () => import("./signup/SignUp.vue"),
-			name: "signup",
-		},
-		{
-			path: "/signin",
-			component: () => import("./signin/SignIn.vue"),
-			name: "signin",
+			path: "/auth",
+			component: () => import("./auth/Auth.vue"),
+			children: [
+				{
+					path: "signin",
+					component: () => import("./auth/signin/SignIn.vue"),
+					name: "signin",
+				},
+				{
+					path: "signup",
+					component: () => import("./auth/signup/SignUp.vue"),
+					name: "signup",
+				},
+			]
 		},
 	],
 });
