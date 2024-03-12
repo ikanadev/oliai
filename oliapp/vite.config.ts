@@ -1,21 +1,14 @@
+import { defineConfig } from 'vite'
+import solid from 'vite-plugin-solid'
+
+// biome-ignore lint/style/useNodejsImportProtocol:
 import path from "path";
-import { defineConfig } from "vite";
-import vue from "@vitejs/plugin-vue";
 
-import tailwind from "tailwindcss";
-import autoprefixer from "autoprefixer";
-
-// https://vitejs.dev/config/
 export default defineConfig({
-	css: {
-		postcss: {
-			plugins: [tailwind(), autoprefixer()],
-		},
-	},
-	plugins: [vue()],
+	plugins: [solid()],
 	resolve: {
 		alias: {
-			"@": path.resolve(__dirname, "./src"),
+			'@': path.resolve(__dirname, './src'),
 		},
 	},
 });
