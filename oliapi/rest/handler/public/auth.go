@@ -14,7 +14,7 @@ func signUp(userRepo repository.UserRepository) echo.HandlerFunc {
 		Email     string `json:"email"     validate:"required,email"`
 		FirstName string `json:"firstName" validate:"required,min=3,max=255"`
 		LastName  string `json:"lastName"  validate:"required,min=3,max=255"`
-		Password  string `json:"password"  validate:"required,min=8,max=255"`
+		Password  string `json:"password"  validate:"required,min=6,max=255"`
 	}
 
 	return func(c echo.Context) error {

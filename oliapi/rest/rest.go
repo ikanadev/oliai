@@ -19,6 +19,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
@@ -40,6 +41,7 @@ func NewRestServer() Server {
 	server.app.Validator = &echoValidator{
 		validator: validator.New(validator.WithRequiredStructEnabled()),
 	}
+	server.app.Use(middleware.CORS())
 	server.protectedApp = server.app.Group("/api")
 	server.protectedApp.Use(echojwt.JWT(server.config.JWTKey), utils.UserIDMiddleware)
 	// Qdrant
