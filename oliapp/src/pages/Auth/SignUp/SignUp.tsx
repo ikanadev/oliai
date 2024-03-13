@@ -4,12 +4,16 @@ import type { ApiError, JSXEvent } from "@/domain";
 import { MessageType } from "@/domain";
 import { useForm } from "@/hooks";
 import { Lock, Mail, User } from "@/icons";
+import { useAppState } from "@/store";
 import { isApiError } from "@/utils";
 import { emailValidator, minLenValidator, nonEmptyValidator } from "@/utils/validators";
 import { A } from "@solidjs/router";
+import { useNavigate } from "@solidjs/router";
 import { Show, createSignal } from "solid-js";
 
 export default function SignUp() {
+	const navigate = useNavigate();
+	const { addMessage } = useAppState();
 	const [errMsg, setErrMsg] = createSignal("");
 	const { form, isValid } = useForm({
 		firstName: { validators: [nonEmptyValidator, minLenValidator(3)] },
@@ -31,17 +35,16 @@ export default function SignUp() {
 			email: form.email.value(),
 			password: form.password.value(),
 		};
-		signUp(data).then((res) => {
-			console.log(res);
+		signUp(data).then((_) => {
+			addMessage("Tu cuenta ha sido creada. Ahora puedes iniciar sesión", MessageType.SUCCESS);
+			navigate("/auth/signin");
 		}).catch((err) => {
 			if (isApiError(err.body)) {
 				setErrMsg((err.body as ApiError).message);
 				return;
 			}
-			// Handle unexpected error
-			console.log(err);
-			console.log(err.body);
-			console.log(err.response);
+			addMessage("Ha ocurrido un error inesperado", MessageType.ERROR);
+			console.error(err);
 		});
 	}
 
