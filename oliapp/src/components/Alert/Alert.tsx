@@ -12,7 +12,7 @@ type Props = {
 export default function Alert(props: Props) {
 	return (
 		<TAlert
-			class="alert shadow-lg pl-4 pr-2 py-2"
+			class="alert shadow-lg pl-4 pr-2 py-1.5 gap-1 sm:gap-4"
 			classList={{
 				"alert-info": props.variant === MessageType.INFO,
 				"alert-success": props.variant === MessageType.SUCCESS,

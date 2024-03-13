@@ -12,6 +12,7 @@
     "@solidjs/router": "^0.13.0",
     "mande": "^2.0.8",
     "solid-js": "^1.8.15",
+    "solid-transition-group": "^0.2.3",
     "terracotta": "^1.0.5"
   },
   "devDependencies": {
