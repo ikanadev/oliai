@@ -1,4 +1,4 @@
-import { mande } from "mande";
+import { mande  } from "mande";
 
 export const api = mande("http://0.0.0.0:4000");
 

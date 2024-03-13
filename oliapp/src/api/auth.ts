@@ -6,5 +6,5 @@ export async function signUp(data: {
 	email: string;
 	password: string;
 }) {
-	return await api.post("/signup", data);
+	return await api.post<number>("/signup", data);
 }
