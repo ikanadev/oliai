@@ -1,6 +1,7 @@
 import { signUp } from "@/api";
 import { Alert } from "@/components";
 import type { ApiError, JSXEvent } from "@/domain";
+import { MessageType } from "@/domain";
 import { useForm } from "@/hooks";
 import { Lock, Mail, User } from "@/icons";
 import { isApiError } from "@/utils";
@@ -48,7 +49,7 @@ export default function SignUp() {
 		<div class="flex flex-col items-center">
 			<h1 class="text-3xl scroll-m-20 font-extrabold tracking-tight mb-2">Crear una cuenta</h1>
 			<Show when={errMsg().length > 0}>
-				<Alert message={errMsg()} variant="warning" onClose={closeErrMsg} />
+				<Alert message={errMsg()} variant={MessageType.WARNING} onClose={closeErrMsg} />
 			</Show>
 
 			<form class="self-stretch flex flex-col mt-2" onSubmit={handleSubmit}>
