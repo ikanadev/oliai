@@ -1,10 +1,17 @@
+import { signIn } from "@/api";
+import { Alert } from "@/components";
+import { type JSXEvent, MessageType } from "@/domain";
 import { useForm } from "@/hooks";
 import { Lock, Mail } from "@/icons";
+import { useAppState } from "@/store";
 import { emailValidator, minLenValidator, nonEmptyValidator } from "@/utils/validators";
 import { A } from "@solidjs/router";
+import { Show, createSignal } from "solid-js";
 
 export default function SignIn() {
-	const { form } = useForm({
+	const { handleApiError } = useAppState();
+	const [errMsg, setErrMsg] = createSignal("");
+	const { form, isValid } = useForm({
 		email: {
 			validators: [nonEmptyValidator, emailValidator],
 		},
@@ -13,11 +20,30 @@ export default function SignIn() {
 		},
 	});
 
+	const closeErrMsg = () => setErrMsg("");
+
+	const handleSubmit = (event: JSXEvent<SubmitEvent, HTMLFormElement>) => {
+		event.preventDefault();
+		if (!isValid()) {
+			return;
+		}
+		signIn({ email: form.email.value(), password: form.password.value() })
+			.then((data) => {
+				console.log(data);
+			}).catch((err) => {
+				handleApiError(err, (msg) => setErrMsg(msg));
+			});
+	}
+
 	return (
 		<div class="flex flex-col items-center">
-			<h1 class="text-3xl scroll-m-20 font-extrabold tracking-tight">Bienvenido a OLIAI</h1>
+			<h1 class="text-3xl scroll-m-20 font-extrabold tracking-tight mb-2">Bienvenido a OLIAI</h1>
 
-			<form class="self-stretch flex flex-col gap-2 mt-4">
+			<Show when={errMsg().length > 0}>
+				<Alert message={errMsg()} variant={MessageType.WARNING} onClose={closeErrMsg} />
+			</Show>
+
+			<form class="self-stretch flex flex-col gap-2 mt-2" onSubmit={handleSubmit}>
 				<label class="form-control">
 					<div class="label">
 						<span class="label-text">Correo</span>
@@ -32,6 +58,7 @@ export default function SignIn() {
 							autocapitalize="off"
 							autocomplete="email"
 							class="grow"
+							required
 						/>
 					</span>
 					<div class="label">
@@ -49,6 +76,7 @@ export default function SignIn() {
 							onInput={form.password.onInput}
 							type="password"
 							placeholder="* * * * * * *"
+							required
 						/>
 					</span>
 					<div class="label">
