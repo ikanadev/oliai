@@ -1,6 +1,17 @@
-import type { ParentProps } from "solid-js";
+import { getToken } from "@/utils";
+import { type ParentProps, onMount } from "solid-js";
+import { useNavigate } from "@solidjs/router";
 
 export default function Auth(props: ParentProps) {
+	const navigate = useNavigate();
+	console.log("render Auth");
+	onMount(() => {
+		const token = getToken();
+		if (token) {
+			navigate("/home", { replace: true });
+		}
+	});
+
 	return (
 		<div class="min-h-screen flex items-start md:items-center">
 			<div class="flex-1 hidden md:block">

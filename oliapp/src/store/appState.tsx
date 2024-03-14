@@ -1,7 +1,10 @@
-import { type ApiError, type AppMessage, MessageType } from "@/domain";
-import { isApiError, API_ERRORS_MAP } from "@/utils";
+import type { ApiError, AppMessage, User } from "@/domain";
+import { MessageType } from "@/domain";
+import { API_ERRORS_MAP, isApiError } from "@/utils";
 import { type ParentProps, createContext, createUniqueId, useContext } from "solid-js";
 import { createStore, produce } from "solid-js/store";
+
+const defaultUser: User = { id: "", firstName: "", lastName: "", email: "" };
 
 type AppStoreActions = {
 	addMessage: (message: string, type: MessageType) => void;
@@ -12,14 +15,20 @@ type AppStoreActions = {
 	deleteMessage: (id: string) => void;
 	// biome-ignore lint/suspicious/noExplicitAny: is checking a type
 	handleApiError: (err: any, cb?: (message: string) => void) => void;
+	setUser: (user: User) => void;
+	clearAppState: () => void;
 };
+
+type AppData = { user: User };
 
 type AppStore = {
 	messages: AppMessage[];
+	appData: AppData;
 } & AppStoreActions;
 
 export const AppStateContext = createContext<AppStore>({
 	messages: [],
+	appData: { user: defaultUser },
 	addMessage: () => { },
 	addErrorMessage: () => { },
 	addWarningMessage: () => { },
@@ -27,10 +36,13 @@ export const AppStateContext = createContext<AppStore>({
 	addSuccessMessage: () => { },
 	deleteMessage: () => { },
 	handleApiError: () => { },
+	setUser: () => { },
+	clearAppState: () => { },
 });
 
 export function AppStateProvider(props: ParentProps) {
 	const [messages, setMessages] = createStore<AppMessage[]>([]);
+	const [appData, setAppData] = createStore<AppData>({ user: defaultUser });
 
 	const addMessage = (message: string, type: MessageType) => {
 		setMessages(produce((old) => {
@@ -63,8 +75,18 @@ export function AppStateProvider(props: ParentProps) {
 		console.error(err);
 	}
 
+	const setUser = (user: User) => {
+		setAppData({ user });
+	};
+
+	const clearAppState = () => {
+		setMessages([]);
+		setAppData({ user: defaultUser });
+	};
+
 	const store = {
 		messages,
+		appData,
 		addMessage,
 		deleteMessage,
 		addErrorMessage,
@@ -72,6 +94,8 @@ export function AppStateProvider(props: ParentProps) {
 		addInfoMessage,
 		addSuccessMessage,
 		handleApiError,
+		setUser,
+		clearAppState,
 	};
 
 	return (

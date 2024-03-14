@@ -4,12 +4,14 @@ import { type JSXEvent, MessageType } from "@/domain";
 import { useForm } from "@/hooks";
 import { Lock, Mail } from "@/icons";
 import { useAppState } from "@/store";
+import { saveToken } from "@/utils";
 import { emailValidator, minLenValidator, nonEmptyValidator } from "@/utils/validators";
-import { A } from "@solidjs/router";
+import { A, useNavigate } from "@solidjs/router";
 import { Show, createSignal } from "solid-js";
 
 export default function SignIn() {
-	const { handleApiError } = useAppState();
+	const navigate = useNavigate();
+	const { handleApiError, setUser } = useAppState();
 	const [errMsg, setErrMsg] = createSignal("");
 	const { form, isValid } = useForm({
 		email: {
@@ -29,7 +31,9 @@ export default function SignIn() {
 		}
 		signIn({ email: form.email.value(), password: form.password.value() })
 			.then((data) => {
-				console.log(data);
+				saveToken(data.token);
+				setUser(data.user);
+				navigate("/home", { replace: true });
 			}).catch((err) => {
 				handleApiError(err, (msg) => setErrMsg(msg));
 			});
