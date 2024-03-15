@@ -4,17 +4,11 @@ import { removeToken, getToken, saveToken } from "@/utils";
 import { useNavigate } from "@solidjs/router";
 import { profile } from "@/api";
 import { setToken, clearToken } from "@/api/mande";
+import Layout from "./Layout";
 
-export default function Index(props: ParentProps) {
+export default function User(props: ParentProps) {
 	const navigate = useNavigate();
 	const { appData, setUser, addErrorMessage, clearAppState } = useAppState();
-
-	const logout = () => {
-		removeToken();
-		clearToken();
-		clearAppState();
-		navigate("/auth/signin", { replace: true });
-	};
 
 	onMount(() => {
 		if (appData.user.id.length > 0) {
@@ -39,12 +33,19 @@ export default function Index(props: ParentProps) {
 		});
 	});
 	return (
-		<div class="flex justify-center">
-			<h1 class="my-20">INDEX</h1>
-			<button type="button" onClick={logout}>logout</button>
-			<Show when={appData.user.id.length > 0} fallback={<p>Loading...</p>}>
-				{props.children}
+		<>
+			<Show
+				when={appData.user.id.length > 0}
+				fallback={
+					<div class="flex flex-col items-center py-20">
+						<span class="loading loading-ring loading-lg" />
+					</div>
+				}
+			>
+				<Layout>
+					{props.children}
+				</Layout>
 			</Show>
-		</div>
+		</>
 	);
 }
