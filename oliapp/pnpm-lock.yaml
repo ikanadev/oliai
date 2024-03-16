@@ -8,6 +8,9 @@ dependencies:
   '@solidjs/router':
     specifier: ^0.13.0
     version: 0.13.0(solid-js@1.8.15)
+  '@tanstack/solid-query':
+    specifier: ^5.28.4
+    version: 5.28.4(solid-js@1.8.15)
   mande:
     specifier: ^2.0.8
     version: 2.0.8
@@ -686,6 +689,19 @@ packages:
     peerDependencies:
       solid-js: ^1.8.6
     dependencies:
+      solid-js: 1.8.15
+    dev: false
+
+  /@tanstack/query-core@5.28.4:
+    resolution: {integrity: sha512-uQZqOFqLWUvXNIQZ63XdKzg22NtHzgCBUfDmjDHi3BoF+nUYeBNvMi/xFPtFrMhqRzG2Ir4mYaGsWZzmiEjXpA==}
+    dev: false
+
+  /@tanstack/solid-query@5.28.4(solid-js@1.8.15):
+    resolution: {integrity: sha512-mAoQmb5f88NcKHd3hei3MV7i2ent1qE7N5KukeY9pji5pX3Kh8I6uhMfBnqJIc5+w7BtMm0jqTw9NawgnQ+x6g==}
+    peerDependencies:
+      solid-js: ^1.6.0
+    dependencies:
+      '@tanstack/query-core': 5.28.4
       solid-js: 1.8.15
     dev: false
 

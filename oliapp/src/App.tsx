@@ -1,11 +1,15 @@
-import type { ParentProps } from "solid-js";
+import { queryClient } from "@/api/queryClient";
 import { AppMessages } from "@/components";
 import { AppStateProvider } from "@/store";
+import { QueryClientProvider } from "@tanstack/solid-query";
+import type { ParentProps } from "solid-js";
 
 function App(props: ParentProps) {
 	return (
 		<AppStateProvider>
-			{props.children}
+			<QueryClientProvider client={queryClient}>
+				{props.children}
+			</QueryClientProvider>
 			<AppMessages />
 		</AppStateProvider>
 	)

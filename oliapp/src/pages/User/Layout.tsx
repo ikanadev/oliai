@@ -5,7 +5,7 @@ import { useAppState } from "@/store";
 import { removeToken } from "@/utils";
 import { useNavigate, A } from "@solidjs/router";
 import type { ParentProps } from "solid-js";
-import { Menu, MenuItem, Popover, PopoverButton, PopoverPanel } from "terracotta";
+import { Popover, PopoverButton, PopoverPanel, Button } from "terracotta";
 
 export default function Layout(props: ParentProps) {
 	const navigate = useNavigate();
@@ -37,11 +37,11 @@ export default function Layout(props: ParentProps) {
 									</span>
 								</PopoverButton>
 								<PopoverPanel class="z-10 p-2 shadow absolute end-0 min-w-[200px]">
-									<Menu class="menu bg-base-200 rounded-box">
-										<MenuItem as="button" onClick={logout} class="btn btn-sm justify-start btn-ghost">
+									<div class="menu bg-base-200 rounded-box">
+										<Button as="button" onClick={logout} class="btn btn-sm justify-start btn-ghost">
 											Cerrar Sesión
-										</MenuItem>
-									</Menu>
+										</Button>
+									</div>
 								</PopoverPanel>
 							</>
 						)}
@@ -50,20 +50,16 @@ export default function Layout(props: ParentProps) {
 			</div>
 			<main class="flex">
 				<nav class="w-[200px]">
-					<ul class="menu w-full rounded-box text-base font-semibold">
-						<li>
-							<A href="/home" activeClass="active">
-								<Home class="text-2xl" /> Inicio
-							</A>
-						</li>
-						<li>
-							<A href="/companies" activeClass="active">
-								<Factory class="text-2xl" /> Empresas
-							</A>
-						</li>
-					</ul>
+					<div class="menu w-full rounded-box text-base font-semibold gap-1">
+						<Button as={A} href="/home" activeClass="btn-active" class="btn justify-start btn-ghost">
+							<Home class="text-2xl" /> Inicio
+						</Button>
+						<Button as={A} href="/companies" activeClass="btn-active" class="btn justify-start btn-ghost">
+							<Factory class="text-2xl" /> Empresas
+						</Button>
+					</div>
 				</nav>
-				<div class="flex-1">
+				<div class="flex-1 pl-4">
 					{props.children}
 				</div>
 			</main>

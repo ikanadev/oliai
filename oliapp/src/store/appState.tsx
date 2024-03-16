@@ -68,6 +68,11 @@ export function AppStateProvider(props: ParentProps) {
 	const handleApiError = (err: any, cb?: (message: string) => void) => {
 		if (err && isApiError(err.body)) {
 			const errMsg = (err.body as ApiError).message;
+			// handle generic errors
+			if (errMsg === "Unauthorized") {
+				addErrorMessage("No tiene permisos para acceder a este recurso");
+				return;
+			}
 			cb?.(API_ERRORS_MAP[errMsg] ?? errMsg);
 			return;
 		}
